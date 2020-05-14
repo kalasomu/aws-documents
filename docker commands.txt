@@ -1,0 +1,605 @@
+https://labs.play-with-docker.com/
+https://jenkins.io/download/
+
+https://docs.docker.com/engine/reference/commandline/rmi/ 
+https://labs.play-with-docker.com/
+https://cloud.google.com/free/
+
+sudo cat /Users/Shared/Jenkins/Home/secrets/initialAdminPassword
+ 
+"<C:\Program Files (x86)\Jenkins\config.xml>"
+Find this <useSecurity>true</useSecurity> and change it to <useSecurity>false</useSecurity> 
+Start Jenkins service 
+ 
+//In DockerPlay Ground
+//+Add/Start New Instance
+Step1 : vi docker-compose.yml
+		Press i Keyword
+		Paste the yml Code (https://gist.github.com/bradtraversy/faa8de544c62eef3f31de406982f1d42) 
+		press ':wq' save the code
+
+Step2 : docker-compose up -d
+Step3 : check your playground IP on your browser then in browser run 
+		192.168.99.100:8181 (Ur yml file metioned port)
+		192.168.99.100:8000
+		192.168.99.100:8080 
+ 
+
+//Install Jenkins		
+Step1: https://www.guru99.com/download-install-jenkins.html
+Or 
+Step1: Capgemini Portal
+
+Step2: in the browser type "http://localhost:8080/"
+
+Step 3: Open "<C:\Program Files(x86)\Jenkins\secrets\initialAdminPassword>"
+		After that Install plugins,create username n password etc.... 
+
+----------------------------------------------------------------------------------------------
+ 
+pipeline {
+environment {
+registry = 'srikanth/ubuntu'
+registryCredential = 'dockerhub'
+dockerImage = ''
+}
+agent any
+tools {nodejs 'node' }
+stages {
+stage('Cloning Git') {
+steps {
+git 'https://github.com/SrikanthPB/capgemini.git'
+}
+}
+stage('Build') {
+steps {
+sh 'npm install'
+sh 'npm run bowerInstall'
+}
+}
+stage('Test') {
+steps {
+sh 'npm test'
+}
+}
+stage('Building image') {
+steps{
+script {
+dockerImage = docker.build registry + ':$BUILD_NUMBER'
+}
+}
+}
+stage('Deploy Image') {
+steps{
+script {
+docker.withRegistry( '', registryCredential ) {
+dockerImage.push()
+}
+}
+}
+}
+}
+pipeline {
+environment {
+registry = 'srikanth/ubuntu'
+registryCredential = 'dockerhub'
+dockerImage = ''
+}
+agent any
+tools {nodejs 'node' }
+stages {
+stage('Cloning Git') {
+steps {
+git 'https://github.com/SrikanthPB/capgemini.git'
+}
+}
+stage('Build') {
+steps {
+sh 'npm install'
+sh 'npm run bowerInstall'
+}
+}
+stage('Test') {
+steps {
+sh 'npm test'
+}
+}
+stage('Building image') {
+steps{
+script {
+dockerImage = docker.build registry + ':$BUILD_NUMBER'
+}
+}
+}
+stage('Deploy Image') {
+steps{
+script {
+docker.withRegistry( '', registryCredential ) {
+dockerImage.push()
+}
+}
+}
+}
+}
+ 
+-------------------------------------------------------------------------------------------------------
+
+
+No Title 
+docker ps 
+
+show running containers
+
+docker ps -a 
+
+show all containers
+
+docker start containerid
+
+dokcer stop containerid
+
+docker rm containerid
+
+docker run -it tomcat 
+
+the above will take u to terminal inside container
+
+if u type exit, container will exit ,
+
+if u type ctrl+ p , ctrl+q , it will come out without stopping container
+
+
+docker -itd tomcat
+
+the above will run in detached mode , it runs the container
+
+it runs but not goes inside
+
+docker exec -it 90c bash
+
+docker run -it 90c bash 
+
+diff between both , in run if u type exit , ur container is destroyed , in exec mode if 
+
+u type exit , ur container is not destroyed
+
+
+in docker you specify the name our containers
+
+docker run -d --name=sample-container tomcat:7 
+
+
+docker kill container id
+
+docker restart container id
+
+docker run -d centos 
+
+by daemon mode , u will not see container containing 
+
+and u cannot attach the container , since its not a interactive mode 
+
+if you want it back you have to go for interactive mode 
+
+---
+
+docker inspect 
+
+
+docker inspect containerid 
+
+
+for linux the gateway starts from 172.17.0.1
+
+172.17.0.2 --etc
+
+for windows the gateway starts from 192.168.99.100 
+
+while creating each container , it keeps on increasing  
+
+192.168.99.101 -- etc 
+
+
+docker rmi ( remove images ) 
+
+
+if u have a container associated ,it says it cannot be removed 
+
+
+we need to remove whatever is assocaited with it, then u can delete
+
+
+
+docker commit container id  image name
+
+
+
+ex:
+
+docker commit 094 sri
+
+this will create an image sri
+
+check with docker images ( this image will be assocaited with container 094
+
+
+image will always get created in layers 
+
+(-)
+(--)
+(---)
+
+check the size of image by docker images 
+
+
+centos - install apache server
+
+---
+
+yum -y install httpd
+
+after installing never use exit 
+
+use ctrl p , ctrl q 
+
+now docker commit containerid centos_http (new name-> image)
+
+
+docker run -itd -p 80:80 centos_httpd /usr/sbin/httpd -D foreground 
+
+
+docker run -itd -p 90:80 centos_httpd /usr/sbin/httpd -D foreground
+
+this time it runs on port 90
+
+docker volume 
+
+it helps us to transfer the files from one image to another
+
+from my home folder to : docker run -itd -v /home/edu/scripts:/scripts ubuntu
+
+
+-----------------
+to remove all container following is the command
+
+# Delete all containers
+docker rm $(docker ps -a -q)
+# Delete all images
+docker rmi $(docker images -q)
+
+
+docker network ls 
+
+echo $DOCKER_HOST 
+
+export DOCKER_HOST =tcp://192:.168.1.11:2345
+
+try now with 
+
+$DOCKER_HOST you will the value printed
+
+etc/default/docker 
+
+ps -ef | grep docker
+
+ifconfig wil get confi of existing docktainer
+
+docker0 : 172.0.0.1
+
+in windows 192.168.99.1 for windwos
+
+
+docker inspect bridge | more 
+
+docker inspect containerid
+
+while i am inside the container i can communicate with another container 
+
+outside i can communicate via docker host only 
+
+ex : create a container 1
+
+create container 2
+
+
+communicate between two containers
+
+ping ipaddres of container1
+
+ping ipaddress of container2
+
+docker port containerid 90 
+
+cannot publish 
+
+docker port containerid (which has already exposed) 90
+
+host:port always 
+
+creating own volume 
+
+docker create -v/tmp --name datacontainer ubuntu
+
+docker run -it --volumes-from datacontainer ubuntu /bin/bash
+
+ex docker run -d -v /home/srikanth/files:/var/log/nginx centos
+
+the above command will link volume between host and container 
+
+any writes on host will be automatically reflected in container and vice versa
+
+lets create one volume
+
+docker volume create --name DataVolume1
+
+DataVolume1
+
+docker run -ti --rm -v DataVolume1:/datavolume1 ubuntu
+
+echo "Example1" > /datavolume1/Example1.txt
+
+exit
+
+docker volume inspect DataVolume1
+
+docker run --rm -ti -v DataVolume1:/datavolume1 ubuntu
+
+cat /datavolume1/Example1.txt
+
+between containers
+
+docker run -ti --name=Container4 -v SampleVolume:/SampleVolume ubuntu 
+
+docker run -ti --name=Container5 --volumes-from Container4 ubuntu
+
+docker history ubuntu 
+
+lists out all the different soft we installed on this
+
+labs.play-with-docker.com 
+ 
+docker ps 
+
+show running containers
+
+docker ps -a 
+
+show all containers
+
+docker start containerid
+
+dokcer stop containerid
+
+docker rm containerid
+
+docker run -it tomcat 
+
+the above will take u to terminal inside container
+
+if u type exit, container will exit ,
+
+if u type ctrl+ p , ctrl+q , it will come out without stopping container
+
+
+docker -itd tomcat
+
+the above will run in detached mode , it runs the container
+
+it runs but not goes inside
+
+docker exec -it 90c bash
+
+docker run -it 90c bash 
+
+diff between both , in run if u type exit , ur container is destroyed , in exec mode if 
+
+u type exit , ur container is not destroyed
+
+
+in docker you specify the name our containers
+
+docker run -d --name=sample-container tomcat:7 
+
+
+docker kill container id
+
+docker restart container id
+
+docker run -d centos 
+
+by daemon mode , u will not see container containing 
+
+and u cannot attach the container , since its not a interactive mode 
+
+if you want it back you have to go for interactive mode 
+
+---
+
+docker inspect 
+
+
+docker inspect containerid 
+
+
+for linux the gateway starts from 172.17.0.1
+
+172.17.0.2 --etc
+
+for windows the gateway starts from 192.168.99.100 
+
+while creating each container , it keeps on increasing 
+
+192.168.99.101 -- etc 
+
+
+docker rmi ( remove images ) 
+
+
+if u have a container associated ,it says it cannot be removed 
+
+
+we need to remove whatever is assocaited with it, then u can delete
+
+
+
+docker commit container id image name
+
+
+
+ex:
+
+docker commit 094 sri
+
+this will create an image sri
+
+check with docker images ( this image will be assocaited with container 094
+
+
+image will always get created in layers 
+
+(-)
+(--)
+(---)
+
+check the size of image by docker images 
+
+
+centos - install apache server
+
+---
+
+yum -y install httpd
+
+after installing never use exit 
+
+use ctrl p , ctrl q 
+
+now docker commit containerid centos_http (new name-> image)
+
+
+docker run -itd -p 80:80 centos_httpd /usr/sbin/httpd -D foreground 
+
+
+docker run -itd -p 90:80 centos_httpd /usr/sbin/httpd -D foreground
+
+this time it runs on port 90
+
+docker volume 
+
+it helps us to transfer the files from one image to another
+
+from my home folder to : docker run -itd -v /home/edu/scripts:/scripts ubuntu
+
+
+-----------------
+to remove all container following is the command
+
+# Delete all containers
+docker rm $(docker ps -a -q)
+# Delete all images
+docker rmi $(docker images -q)
+
+
+docker network ls 
+
+echo $DOCKER_HOST 
+
+export DOCKER_HOST =tcp://192:.168.1.11:2345
+
+try now with 
+
+$DOCKER_HOST you will the value printed
+
+etc/default/docker 
+
+ps -ef | grep docker
+
+ifconfig wil get confi of existing docktainer
+
+docker0 : 172.0.0.1
+
+in windows 192.168.99.1 for windwos
+
+
+docker inspect bridge | more 
+
+docker inspect containerid
+
+while i am inside the container i can communicate with another container 
+
+outside i can communicate via docker host only 
+
+ex : create a container 1
+
+create container 2
+
+
+communicate between two containers
+
+ping ipaddres of container1
+
+ping ipaddress of container2
+
+docker port containerid 90 
+
+cannot publish 
+
+docker port containerid (which has already exposed) 90
+
+host:Port always 
+
+creating own volume 
+
+docker create -v/tmp --name datacontainer ubuntu
+
+docker run -it --volumes-from datacontainer ubuntu /bin/bash
+
+ex docker run -d -v /home/srikanth/files:/var/log/nginx centos
+
+the above command will link volume between host and container 
+
+any writes on host will be automatically reflected in container and vice versa
+
+lets create one volume
+
+docker volume create --name DataVolume1
+
+DataVolume1
+
+docker run -ti --rm -v DataVolume1:/datavolume1 ubuntu
+
+echo "Example1" > /datavolume1/Example1.txt
+
+exit
+
+docker volume inspect DataVolume1
+
+docker run --rm -ti -v DataVolume1:/datavolume1 ubuntu
+
+cat /datavolume1/Example1.txt
+
+between containers
+
+docker run -ti --name=Container4 -v SampleVolume:/SampleVolume ubuntu 
+
+docker run -ti --name=Container5 --volumes-from Container4 ubuntu
+
+docker history ubuntu 
+
+lists out all the different soft we installed on this
+
+labs.play-with-docker.com
+
+docker commit containerid imagename
+
+docker tag imageid username/newimagename
+
+docker push username/imagename
+
+docker commit containerid imagename
+
+docker tag imageid username/newimagename
+
+docker push username/imagename
+
+ 

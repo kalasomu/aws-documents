@@ -1,0 +1,333 @@
+docker run ubuntu df -h --> this exec the cmd on os and exited out from container
+docker run -it ubuntu /bin/bash --> I "interactive mode" T "terminal" will go inside the container 
+Ctrl p + q --> to run in background
+
+docker ps ---> will list active container
+docker ps -a ---> all
+docker ps -l --> latest
+docker ps -q --> running container ID only
+docker ps -qa --> all running container ID only
+docker run -itd ubuntu /bin/bash --> D "will not go inside the container and it will container is in started state"
+docker run -itd --name=vm1 ubuntu --> to create container name
+
+docker stop <CID> or <Cname> --> stop the container
+docker start <CID> or <Cname> --> start the container
+root@ip-172-31-81-46:/home/ubuntu# docker run -i -t rhel /bin/bash
+Unable to find image 'rhel:latest' locally
+docker: Error response from daemon: pull access denied for rhel, repository does not exist or may require 'docker login': denied: requested access to the resource is denied.
+See 'docker run --help'. 
+
+docker-compose.yml
+
+version: '3'
+services:
+  my_service:
+    image: my/image
+    environment:
+      - "PS1=$$(whoami):$$(pwd) $$ " 
+
+[root@jenkins-master ~]# systemctl status docker --> check the docker service is running
+[root@jenkins-master ~]# docker --version --> to check the docker version
+[root@jenkins-master ~]# docker run hello-world --> check the response from docker
+[root@jenkins-master ~]# docker system info --> should be in active
+
+Dcoker Compontents ---
+Images -> Read only templets
+Containers --> R/W templets
+networks --> hypotical n/w
+Data volumes --> persistent data
+registories --> docker hub
+
+https://docs.docker.com/engine/docker-overview/ --> docs link
+https://hub.docker.com/ --> docker regist
+
+[root@jenkins-master ~]# ls -l /var/lib/docker ---> default path of docker
+total 4
+drwx------. 2 root root 24 Mar 3 16:40 builder
+drwx--x--x. 4 root root 92 Mar 3 16:40 buildkit
+drwx------. 5 root root 222 Mar 4 09:55 containers
+drwx------. 3 root root 22 Mar 3 16:40 image
+drwxr-x---. 3 root root 19 Mar 3 16:40 network
+drwx------. 10 root root 4096 Mar 4 09:55 overlay2
+drwx------. 4 root root 32 Mar 3 16:40 plugins
+drwx------. 2 root root 6 Mar 4 09:54 runtimes
+drwx------. 2 root root 6 Mar 3 16:40 swarm
+drwx------. 2 root root 6 Mar 4 09:54 tmp
+drwx------. 2 root root 6 Mar 3 16:40 trust
+drwx------. 2 root root 25 Mar 3 16:40 volumes
+
+docker run ubuntu df -h --> this exec the cmd on os and exited out from container
+docker run -it ubuntu /bin/bash --> I "interactive mode" T "terminal" will go inside the container 
+Ctrl p + q --> to run in background
+
+docker ps ---> will list active container
+docker ps -a ---> all
+docker ps -l --> latest
+docker ps -q --> running container ID only
+docker ps -qa --> all running container ID only
+
+docker run -itd ubuntu /bin/bash --> D "will not go inside the container and it will container is in started state"
+docker run -itd --name=vm1 ubuntu --> to create container name
+
+docker stop <CID> or <Cname> --> stop the container
+docker start <CID> or <Cname> --> start the container
+docker rename <Cname> <new name> --> rename the container
+
+
+docker exec -it <CID> or <Cname> /bin/bash --> will help you to go inside the container and can exit.
+docker attach <CID> or <Cname> --> with take to running container and should pass read escape sequence again for bachgrond. (not a good idea)
+docker kill <CID> or <Cname> --> to kill container if unable to stop 
+docker logs <Cname> --> logs to check
+docker logs host1 --tail 3 --> see last 3 lines
+docker stats host1 --> to check CPU/memory usages 
+docker top host1 --> shows the process 
+
+
+docker exec -it <CID> or <Cname> /bin/bash --> will help you to go inside the container and can exit.
+docker attach <CID> or <Cname> --> with take to running container and should pass read escape sequence again for bachgrond. (not a good idea)
+docker kill <CID> or <Cname> --> to kill container if unable to stop 
+docker logs <Cname> --> logs to check
+docker logs host1 --tail 3 --> see last 3 lines
+docker stats host1 --> to check CPU/memory usages 
+docker top host1 --> shows the process
+
+docker container prune --> prune will clean/remove up all the stopped container 
+
+docker rm host1 --> this to remove the container
+docker rm -f ---> remove the container force 
+
+
+
+docker run -itd --name=vm1 --rm ubuntu ---> --rm will deleted the container when its stoped
+docker stop vm1 --> when the container is stopped it will be no more 
+docker run -itd --name=vm1 --rm ubuntu --> so you can create it with same container name again
+ 
+docker run -it ubuntu /bin/bash 
+docker ps 
+ 
+root@ip-172-31-34-57:/var/lib/docker/image# docker ps -qa
+2158a3eea59d
+8c06cc08c02f
+23fb607acf01
+107dc71f300e 
+ 
+docker inspect <Cname> --> for more informations in details 
+
+docker images --> cmd to see the list of images
+docker images types --
+1. Official images
+2. Verified images
+3. users images
+
+docker pull centos --> without ":" it will pull latest image from docker hub
+docker pull centos:7.5.1804 --> here tag has been provided to download with verstion
+docker run -itd --name=host2 centos:7.5.1804 --> spin the centos 7.5 
+
+docker pull httpd
+docker images
+docker system df --> it will show the info for usages
+docker run -itd --name=host1 httpd --> spinning the apache image
+docker ps --> check the PORT number which is not blank and defeault port is 80
+docker run -itd --name=app2 -P httpd --> P creats random port mapping to 80
+docker ps --> check the post number created
+docker run -itd --name=app3 -p 8081:80 httpd --> p creats a required port 
+docker ps --> check the status
+ifconfig --> check port avaliablity from main phycial server
+
+browse from the IE and check the applications status
+docker stop app2 --> stop the check the application from browser
+
+### creating a custom image ###
+docker run -itd --name=sys1 centos --> Ran the centos image 
+docker exec -it sys1 /bin/bash --> went inside to it and created a dir
+mkdir /chethan
+dcoker stop sys1 --> stopped the container 
+docker rm -f sys1 --> removed it
+
+when we rerun the "docker run -itd --name=sys1 centos" cmd dir was missing since its not svaed in images
+repeat the same steps and create a custom image 
+
+docker commit sys1 img:v1 --> creating the image copy post editing the container ":" saves as tags for the images version
+docker run -itd --name=sys2 img:v1 --> creating the new container using custome image
+docker exec -it sys1 /bin/bash --> check the dir is exists
+
+=== Docker push ===
+docker images --> check the cusume image name
+docker tag img:v1 bschethan99/img:v1 --> tag the name as per the docker hub account ID
+docker images --> check the tag has been showing the same referance of image mapping same image ID 
+docker login --> login using a docker account
+docker push bschethan99/img:v1 -> push the image to the central
+docker rm <Cname> --> delete all the container 
+docker rmi <Img-name> --> delete all the images 
+docker pull bschethan99/img:v1 --> pull the image back from central 
+docker images --> check the status back 
+docker run -it --name=sys1 bschethan99/img:v1 --> check the dir exists as per custum imgage which we commit
+
+ 
+yum install httpd -y
+2 ls -l /var/www/html/
+3 cd /var/www/html/
+4 ls -ltra
+5 vim index.html
+6 yum install vim -y
+
+/usr/sbin/httpd -DFOREGROUND -e debug
+
+#### Docker network ####
+docker network ls --> list all the network from docker
+docker network create --subnet 192.168.10.0/24 appnet --> cteate a new network
+docker network ls --> check its created or not (default is bridge)
+
+docker run -itd --name=nw3 --net appnet centos --> created a new cantainers part of "appnet" network
+docker run -itd --name=nw4 --net appnet centos --> created a new cantainers part of "appnet" network
+
+docker exec -it nw3 /bin/bash --> going inside "nw3" to test the connection
+[root@0f4dd092a0e4 /]# ping nw4 ---> able to reslove
+PING nw4 (192.168.10.3) 56(84) bytes of data.
+64 bytes from nw4.appnet (192.168.10.3): icmp_seq=1 ttl=64 time=0.222 ms
+64 bytes from nw4.appnet (192.168.10.3): icmp_seq=2 ttl=64 time=0.080 ms
+
+[root@0f4dd092a0e4 /]# ping fa2cb0d97737 --> using CID test
+PING fa2cb0d97737 (192.168.10.3) 56(84) bytes of data.
+64 bytes from nw4.appnet (192.168.10.3): icmp_seq=1 ttl=64 time=0.074 ms
+64 bytes from nw4.appnet (192.168.10.3): icmp_seq=2 ttl=64 time=0.082 ms
+
+[root@0f4dd092a0e4 /]# ping nw1 --> tring to ping which was not part of "appnet" network and its fails
+ping: nw1: Name or service not known
+[root@0f4dd092a0e4 /]# ping nw2 --> tring to ping which was not part of "appnet" network and its fails
+
+docker network connect appnet nw1 --> adding the "appnet" network for running CID
+docker network connect appnet nw2 --> adding the "appnet" network for running CID
+docker exec -it nw3 /bin/bash --> going to test again
+[root@0f4dd092a0e4 /]# ping nw1 -- > its works fine
+PING nw1 (192.168.10.4) 56(84) bytes of data.
+64 bytes from nw1.appnet (192.168.10.4): icmp_seq=1 ttl=64 time=0.137 ms
+
+docker inspect nw4
+
+### Docker Volume ####
+docker volume ls --> cmd to list
+docker volume create datavol --> to create a volume
+docker volume ls --> check back
+
+cd /var/lib/docker/volumes/datavol/_data/ ---> path to place our data
+[root@jenkins-master _data]# pwd --> ensure you in this path
+/var/lib/docker/volumes/datavol/_data
+
+docker run -itd --name=vol1 -v datavol:/var/www/html centos --> created a new CID with vol name
+docker exec -it vol1 /bin/bash --> going inside a CID and check data is exists
+cd /var/www/html/
+vi index.html --> try editing the data
+cat > vol1 --> try creating the data
+
+docker rm -f --> remove all CID's
+
+[root@jenkins-master _data]# pwd --> check in data vol path still the data is exists
+/var/lib/docker/volumes/datavol/_data
+[root@jenkins-master _data]# ls -ltr
+total 8
+-rw-r--r--. 1 root root 42 Mar 5 12:51 index.html
+-rw-r--r--. 1 root root 6 Mar 5 12:51 vol1
+
+docker run -itd --name=vol2 -v datavol:/var/www/html centos --> create a new CID using a same VOL mount
+[root@jenkins-master _data]# docker exec -it vol2 /bin/bash --> validate again data is there are not
+[root@4e09b4ea13f4 /]# cd /var/www/html/
+[root@4e09b4ea13f4 html]# ls -ltra
+-rw-r--r--. 1 root root 42 Mar 5 07:21 index.html
+drwxr-xr-x. 2 root root 36 Mar 5 07:21 .
+-rw-r--r--. 1 root root 6 Mar 5 07:21 vol1
+drwxr-xr-x. 3 root root 18 Mar 5 07:25 ..
+ 
+
+### Docker Volume ####
+docker volume ls --> cmd to list
+docker volume create datavol --> to create a volume
+docker volume ls --> check back
+
+cd /var/lib/docker/volumes/datavol/_data/ ---> path to place our data
+[root@jenkins-master _data]# pwd --> ensure you in this path
+/var/lib/docker/volumes/datavol/_data
+
+docker run -itd --name=vol1 -v datavol:/var/www/html centos --> created a new CID with vol name
+docker exec -it vol1 /bin/bash --> going inside a CID and check data is exists
+cd /var/www/html/
+vi index.html --> try editing the data
+cat > vol1 --> try creating the data
+
+docker rm -f --> remove all CID's
+
+[root@jenkins-master _data]# pwd --> check in data vol path still the data is exists
+/var/lib/docker/volumes/datavol/_data
+[root@jenkins-master _data]# ls -ltr
+total 8
+-rw-r--r--. 1 root root 42 Mar 5 12:51 index.html
+-rw-r--r--. 1 root root 6 Mar 5 12:51 vol1
+
+docker run -itd --name=vol2 -v datavol:/var/www/html centos --> create a new CID using a same VOL mount
+[root@jenkins-master _data]# docker exec -it vol2 /bin/bash --> validate again data is there are not
+[root@4e09b4ea13f4 /]# cd /var/www/html/
+[root@4e09b4ea13f4 html]# ls -ltra
+-rw-r--r--. 1 root root 42 Mar 5 07:21 index.html
+drwxr-xr-x. 2 root root 36 Mar 5 07:21 .
+-rw-r--r--. 1 root root 6 Mar 5 07:21 vol1
+drwxr-xr-x. 3 root root 18 Mar 5 07:25 ..
+ 
+### Docker Volume ####
+docker volume ls --> cmd to list
+docker volume create datavol --> to create a volume
+docker volume ls --> check back
+
+cd /var/lib/docker/volumes/datavol/_data/ ---> path to place our data
+[root@jenkins-master _data]# pwd --> ensure you in this path
+/var/lib/docker/volumes/datavol/_data
+
+docker run -itd --name=vol1 -v datavol:/var/www/html centos --> created a new CID with vol name
+docker exec -it vol1 /bin/bash --> going inside a CID and check data is exists
+cd /var/www/html/
+vi index.html --> try editing the data
+cat > vol1 --> try creating the data
+
+docker rm -f --> remove all CID's
+
+[root@jenkins-master _data]# pwd --> check in data vol path still the data is exists
+/var/lib/docker/volumes/datavol/_data
+[root@jenkins-master _data]# ls -ltr
+total 8
+-rw-r--r--. 1 root root 42 Mar 5 12:51 index.html
+-rw-r--r--. 1 root root 6 Mar 5 12:51 vol1
+
+docker run -itd --name=vol2 -v datavol:/var/www/html centos --> create a new CID using a same VOL mount
+[root@jenkins-master _data]# docker exec -it vol2 /bin/bash --> validate again data is there are not
+[root@4e09b4ea13f4 /]# cd /var/www/html/
+[root@4e09b4ea13f4 html]# ls -ltra
+-rw-r--r--. 1 root root 42 Mar 5 07:21 index.html
+drwxr-xr-x. 2 root root 36 Mar 5 07:21 .
+-rw-r--r--. 1 root root 6 Mar 5 07:21 vol1
+drwxr-xr-x. 3 root root 18 Mar 5 07:25 ..
+ 
+
+
+https://hub.docker.com/?ref=login 
+
+ 
+
+
+AWS NOTES:
+https://aws.amazon.com/premiumsupport/knowledge-center/connect-http-https-ec2/ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
