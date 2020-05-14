@@ -1,0 +1,85 @@
+CloudFront
+
+- Content Delivery Network CDN
+- system of distributed servers (network) that deliver webpages
+- and web content to a user based on the geographic locations of the 
+  user origin of the webpage and a content deliver server as well.
+
+Amazon CloudFront can be used to deliver 
+- entire website,including dynamic,static,streaming and interactive content
+  using global network of edge locations
+- requests are automatically routed to nearest edge locations so content is 
+  delivered with the best possible performance
+
+Amazon CloudFront is optomized to work with other Amazon Web Services like
+- Amazon S3 
+- Amazon EC2 
+- Amazon Elastic LoadBalancing
+- Amazon Route53
+- and works with seemlessly with any non-AWS origin Server
+  which stores original,definitive versions of the files.  
+  
+Key Terminology
+- Edge Location -> where content will be cached, this is separate to an AWS region/AZ
+                   not read only, we can write to them also.(put an object to that)
+				   objects are cached for the life of TTL
+				   clearing cache will be charged				   
+- Origin -> origin of all files that CDN will distribute,this can be either an S3 bucket
+            and EC2 instance, and Elastic LoadBalancer or Route53
+- Distribution -> name given for CDN which consists of collection of Edge Locations
+- Web Distribution -> typically used for WebSites
+- RTMP -> Used for Media Streaming
+________________________________________________________________________________________
+
+Create CDN 
+
+Create a bucket and put a picture in it.
+
+Networking & Content Delivery -> CloudFront -> Create Distribution
+-> Web -> Get Started 
+   -> Origin Domain Name - websiteramnet.s3.amazonaws.com
+                           Amazon S3 bucket or web server from 
+                           which you want CloudFront to get your web content
+
+      Origin Path -> Leave it Blank
+	  Origin ID -> S3-websiteramnet (automatically will take)
+	  Restrict Bucket Access -> YES
+	  Origin Access Identity -> Create a New Identity
+	  Grant Read Permissions on Bucket -> Yes, Update Bucket Policy
+	  
+	  Path Pattern -> Default (*)
+	  Viewer Protocol Policy -> Redirect HTTP to HTTPS
+	  Allowed HTTP Methods -> GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE
+      Cached HTTP Methods -> Leave it 
+      Object Caching -> Use Origin Cache Headers	  
+	  Minimum TTL Maximum TTL Default TTL -> default values
+	  Forward Cookies,Query String Forwarding and Caching -> Leave It
+	  Smooth Streaming -> No (its Microsoft Settings)
+	  Restrict Viewer Access  -> YES 
+      (Use Signed URLs or Signed Cookies for to access the content)
+	  Compress Objects Automatically -> NO 
+	  
+	-> Distribution Settings
+	   Price Class -> Use all Edge Locations 
+	   AWS WAF Web ACL -> None
+	   (Web Application Fierwall) 
+      Alternate Domain Names(CNAMEs) -> (leave it blank)
+	  Supported HTTP Versions -> HTTP/2, HTTP/1.1, HTTP/1.0
+	  Default Root Object -> Blank
+	  Logging -> Off
+	  Distribution State -> Enabled
+	  
+	  Click Create Distribution
+       
+      earlier accessing the Pic in bucket like this 	   
+	  https://s3.ap-south-1.amazonaws.com/websiteramnet/aws.jpg 
+	  
+	  after creating cloudfront, you can access it like this 
+	  https://ashdjahsdjasghdjahsd.cloudfront.net/aws.jpg 
+	  
+	  Once Created you can chk the descriptions and other tabs as well 
+	  BlackListing and Whitelisting as well 
+	  
+	  10-15 mins it takes to create the distributions and 
+	  while deleting it takes same time.
+________________________________________________________________________________________

@@ -1,0 +1,35 @@
+Databases Elasticache 
+
+- Elasticache is web service that may easy to deploy,operate,and scale an 
+   in-memory cache in the cloud.
+ - this service improves the performance of web applications by allowing you 
+   to retrieve information fast, managed,in-memory caches, instaed of relying
+   entirely on slower-disk based databases.
+ - Elasticache supports two open-source in-memory caching engines
+   - MemCached
+   - Redis
+
+Amazon Elasticache
+  - can be used to significantly improves latency and throughput for many 
+    read-heavy application workloads such as social networking,gaming,media sharing
+	and Q&A portals
+  - or compute intensive workloads such as recommendation engines
+  - caching improves application performance by storing critical pieces of data 
+    in memory for low-latency access.
+  - cached information may include the results of I/O intensive database queries
+    or the results of computationally intensive calculations.
+	
+Types of Elasticache
+  - MemCached
+    Widely adopted memory object caching system.Elasticache is protocol compliant with 
+	MemCached,so popular tools that you use today with existing MemCached environments
+	will work seamlessly with the service.
+  - Redis
+    Popular open-source in-memory key-value store that supports data strcutures such as 
+	sorted sets and lists.Elasticache supports Master/Slave replication and Multi AZ
+	which can be used to achieve cross AZ redundancy.
+
+Elasticache is good choice if database is particularly read heavy and not prone
+to frequent changing.
+  
+   

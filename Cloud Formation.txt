@@ -1,0 +1,59 @@
+Cloud Formation
+
+What is AWS CloudFormation?
+
+- AWS CloudFormation is a service that helps you model and set up your 
+  Amazon Web Services resources so that you can spend less time managing 
+  those resources and more time focusing on your applications that run in AWS. 
+- You create a template that describes all the AWS resources that you want 
+  (like Amazon EC2 instances or Amazon RDS DB instances). 
+- AWS CloudFormation takes care of provisioning and configuring those 
+  resources for you. You don't need to individually create and configure 
+  AWS resources and figure out what's dependent on what; AWS CloudFormation 
+  handles all of that. 
+- you can create or modify an existing AWS CloudFormation template
+  A template describes all of your resources and their properties. 
+  When you use that template to create an AWS CloudFormation stack, 
+  AWS CloudFormation provisions the Auto Scaling group,load balancer, 
+  and database for you.
+- You can delete the stack just as easily,which deletes all the resources 
+  in the stack. 
+- By using AWS CloudFormation,you easily manage a collection 
+  of resources as a single unit. 
+  
+Services -> Management Tools -> CloudFormation -> Create a new stack 
+Select Template
+Select the template that describes the stack that you want to create. 
+A stack is a group of related resources that you manage as a single unit.
+
+Choose a template
+A template is a JSON/YAML-formatted text file that describes your stack's 
+resources and their properties.
+
+Select a sample template
+- Multi AZ Samples WordPress Blog
+
+Stack name: RouteStack
+Parameters
+ - DBAllocatedStorage 5 Gb
+ - DBClass db.t2.micro
+ - DBName:wordpressdb
+ - DBPassword:wordpressdb
+ - DBUser:wordpressdb
+ - Instance Type :t1.micro
+ - KeyName: 'yourname.pem'
+ - MultiAZDatabase:false
+ - SSHLocation: 0.0.0.0/0
+ - Subnets: select both default Subnets from dropdown list
+ - VpcId: select your 'default Vpc' from dropdown list 
+ - WebServerCapacity: 1
+ 
+You can click Next 
+It will Take 15-20 minutes to create all Resources we selected.
+________________________________________________________________________
+
+Once You Verify all Instances are Wokring fine,can delete 
+the Stack by 
+Actions -> Delete Stack
+ - you can see entire infrastructure got deleted.
+________________________________________________________________________

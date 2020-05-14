@@ -1,0 +1,130 @@
+RDS Configuration
+
+Create Security Group for the DB Instance
+
+EC2 Dashboard 
+-> Network Security - Create Security Group 
+   Name:myRDSsecurityGroup
+   Default VPC
+   (no rules to get added now)   
+
+RDS Dashboard 
+-> Get Started Now -> 
+   - MySQL MySQL Community Edition - Select
+     Only show options that are eligible for RDS Free Tier - tick it!
+	 DB Engine - mysql
+	 License Model - General Public License
+	 DB Engine Version - 5.6.35
+	 DB Instance Class - db.t2.micro - 1vCPU,1GB RAM
+	 Multi-AZ Deployment - No
+	 Storage Type - General Purpose(SSD)
+	 Allocated Storage - 5GB
+	 
+	 Settings 
+	 DB Instance Identifier - rdsdbuser
+	 Master Username - rdsdbuser
+	 Master Password - rdsdbuser
+	 Master Password - rdsdbuser
+	 
+Configure Advanced Settings
+    Network & Security 
+	VPC* Default VPC
+	Subnet Group - Default
+	Publicly Accessible - Yes
+	Availability Zone - No Preference
+	VPC Security Group(s) - myRDSsecurityGroup(VPC)
+Database Options 
+    Database Name - rdsdbuser
+	Database Port - 3306
+	DB Parameter Group - default.mysql5.6
+	Option Group - default.mysql-5.6
+	Copy Tags To Snapshots - DONT CHECK IT
+	Enable IAM DB Authentication - No Preference
+	Enable Encryption - No 
+Backup,Monitoring,Maintenance  ---> Leave it with Default Settings
+Click Launch DB Instance
+
+Creating DB Instance may take 10-15 mins
+
+
+EC2 Dashboard
+Insatnces - Create Instance 
+- Amazon Linux AMI 2017.03.1 (HVM), SSD Volume Type - ami-47205e28
+- Security Group - DBserverSEC
+
+Advanced Details 
+paste this script As Text 
+
+#!/bin/bash
+yum install httpd php php-mysql -y
+yum update -y
+chkconfig httpd on
+service httpd start
+echo "<?php phpinfo();?>" > /var/www/html/index.php
+
+Once Insatnce Launched check it in browser with 
+http://13.126.228.158/index.php
+- you shld see the php index page
+
+then ssh the Linux Instance and edit 'connect.php'file 
+
+[ec2-user@ip-172-31-5-113 ~]$ cd /var/www/html
+[ec2-user@ip-172-31-5-113 html]$ ls -l
+total 4
+-rw-r--r-- 1 root root 19 Aug  2 14:14 index.php
+[ec2-user@ip-172-31-5-113 html]$ sudo su
+[root@ip-172-31-5-113 html]# nano connect.php
+copy paste the connect.php inside the file
+and edit this line 
+$hostname ="<copy paste the Public DNS Endpoint of the DB Instance>"
+Ctrl+X and Yes to save and come out
+
+[root@ip-172-31-5-113 html]# ls -l
+total 8
+-rw-r--r-- 1 root root 514 Aug  2 14:20 connect.php
+-rw-r--r-- 1 root root  19 Aug  2 14:14 index.php
+[root@ip-172-31-5-113 html]# cat connect.php
+<?php
+$username = "rdsdbuser";
+$password = "rdsdbuser";
+$hostname = "rdsdbuser.ctyx2qkvjuvc.ap-south-1.rds.amazonaws.com:3306";
+$dbname = "rdsdbuser";
+
+//connection to the database
+$dbhandle = mysql_connect($hostname, $username, $password)
+  or die("Unable to connect to MySQL");
+echo "(connected to MySQL using username - $username, password - $password, host - $hostname<br>";
+$selected = mysql_select_db("$dbname",$dbhandle)
+  or die("Could not connect to database");
+echo "Connected to Database - $dbname";
+?>
+[root@ip-172-31-5-113 html]#
+
+
+if you try connect to the DB from browser
+http://13.126.228.158/connect.php
+Unable to connect to MySQL  <=== you get this 
+
+Reason is Security Groups are different from DB and AMI Linux
+So Just go to EC2 Dashboard -> Security Groups -> myRDSsecurityGroup
+ -> inboung rules -> edit 
+ MySQL/Aurora-TCP-3306-Custom-Select DBserverSEC
+ Click SAVE
+
+After the association happen,you can refresh the screen,you will get in browser screen as 
+"connected to MySQL using username - rdsdbuser, password - rdsdbuser, 
+host - rdsdbuser.ctyx2qkvjuvc.ap-south-1.rds.amazonaws.com:3306"
+Connected to Database - rdsdbuser
+
+Once All Verfied,
+ - Please Delete the DB Instance 
+ - Say NO to 'Do you want to create a Final Snapshot?'
+   and check box 'I Acknowledge.........blah blah....'
+   Click Delete 
+ - Terminate the Linux Box 
+ - and Delete all associated Security Groups as well.
+
+Deleting DB Instance may take 10-15 mins
+
+Go to RDS Dashboard and Verify NO DB Instances are Running !!!!
+________________________________________________________________________________________________________

@@ -1,0 +1,54 @@
+AWS Creating Identity and Access Management
+
+- Root Login vs User Login
+- Create Groups and Attach Policies
+- Grant Full Admin Access
+
+Security,Identity & Compliance Dashboard -> IAM
+
+This link will be login page for the users created
+IAM users sign-in link: 
+
+https://42542258318787.signin.aws.amazon.com/console 
+
+click 'Customize' and change the name 
+https://companydemo.signin.aws.amazon.com/console 
+
+Security, Identity & Compliance Dashboard -> IAM->Account Settings 
+
+Tick it whichever you would like to enable it 
+
+Minimum password length:6
+Require at least one uppercase letter 
+Require at least one lowercase letter 
+Require at least one number
+Require at least one non-alphanumeric character
+Allow users to change their own password
+Enable password expiration 
+Password expiration period (in days):
+Prevent password reuse
+Number of passwords to remember:
+Password expiration requires administrator reset
+
+and 
+Apply Password Policy 
+
+Security, Identity & Compliance Dashboard -> IAM-> Users -> Add User
+
+Click this to login as 'root' always 
+Sign-in using root account credentials
+
+Instead of Creating individual User,you can Create New Group 
+Create New Group -> Name -> Create Group (policy attaching we do later)
+Click on New Group - attach Users to group 
+Left Pane Policies -> IAM FullAccess , AdministratorAccess
+                      and click on 'show policy' can see the script
+Put all new users under the same group 'ramnetgroup' and 
+so that they will inherit the rights/permissions frm the 'companygroup'
+
+Login as a new user 'hyena' to this URL
+https://companydemo.signin.aws.amazon.com/console
+____________________________________________________________________________________
+					  
+
+

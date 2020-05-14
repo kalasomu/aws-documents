@@ -1,0 +1,18 @@
+Creating a Billing Alarm 
+
+Login to AWS Console and Click your name and click 'My Billing Dashboard'
+
+- you can see costs occurred until now!
+- Click 'Preferences' and can select 
+  Receive PDF Invoice By Email
+  Receive Billing Alerts - Click this (you can revert this setting)
+  Receive Billing Reports
+  
+  and Click 'Manage Billing Alerts'
+  Click Alarms and Create Alarm
+  Browse and Select Metric
+  and Define Alarm
+  then at last Create Alarm
+  it can send email to with all alarming level of util/money and so on
+  per instance level we can do that
+_________________________________________________________________________________

@@ -1,0 +1,68 @@
+RedShift - Data Warehousing Service
+
+- Amazon RedShift is fast and powerful,fully managed,petabyte-scale 
+  data warehouse service in the cloud
+- customers can start small for just $0.25 per hour with no commitments or upfront costs
+- can scale to a petabyte or more for $1000 per terabyte per year
+- thats less than tenth of most other data warehousing solutions.
+
+OLAP (OnLine Analytic Processing)
+
+- OLAP transaction example 
+  - Net Profit for EMEA and Pacific for the digital Radio Product
+    Pulls in large nmbers of records
+  
+  Sum of Radios sold in EMEA
+  Sum of Radios sold in Pacific
+  Unit Cost of Radio in each region
+  Sales Price of each Radio
+  Sales Price - Unit Cost
+  
+  Like these queries can be done in RedShift
+  
+  Data Warehousing databases use differnet type of architecture
+  both from a database perspectve and infrastructure layer.
+  
+RedShift Configuration 
+  
+  - Single Node (160GB)
+  - MultiNode 
+    - Leader Node(manages cleint connections and receives queries)
+	- Compute Node (store data and perform queries and computations)
+	- up to 128 Compute Nodes possible
+	
+RedShift is 10 times faster
+ - Columnar Data Storage 
+   Columnar storage for database tables is an important factor in optimizing
+   analytic query performance because it drastically reduces the overall 
+   disk I/O requirements and reduces the amount of data you need to load 
+   from disk. 
+   http://docs.aws.amazon.com/redshift/latest/dg/c_columnar_storage_disk_mem_mgmnt.html
+ - Advanced Compressions
+ - Massively Parallel Processing (MPP)
+   enables fast execution of the most complex queries operating on large amounts of data. Multiple compute nodes handle all 
+   query processing leading up to final result aggregation, with each core of each 
+   node executing the same compiled query segments on portions of the entire data. 
+   http://docs.aws.amazon.com/redshift/latest/dg/c_challenges_achieving_high_performance_queries.html
+   
+RedShift Pricing 
+  - Compute Node Hours 
+    Total Number of Hours run across all compute modes for billing period
+	no charge for leader mode hours,only compute nodes are charged.
+	1 unit/per node per hour,so 3 mode data warehouse cluster running 
+	persistently for entire month incur 2,160 hours.
+  - Backup - you will get charged
+  - Data Transfer (only withing VPC,not outside it)
+  
+RedShift Security
+   - everything is encrypted in transit using SSL 
+   - envrypted at rest using AES-256 encryption
+   - by default RedShift takes care of the key management
+     manage your own keys through HSM
+	 AWS key management Service
+RedShift Availability
+   - currently available in certain AZ
+   - can restore snapshots to new AZ's in the event of an outage
+   
+   RedShift is good choice if the database is feeling stress becoz management keep 
+running OLAP tranactions on it etc.

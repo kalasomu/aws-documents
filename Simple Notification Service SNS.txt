@@ -1,0 +1,120 @@
+Simple Notification Service SNS
+
+- Mobile Section we can see this service
+- SNS is we service that akes easy to setup,operate
+  and send notifications from the cloud/
+- It provides developers with a highly scalable,flexible and
+  cost-effective capability to publish messages from an application
+  and immdtly deliver them to subscribers or other applications
+- push notifications to Apple,Google,Fire OS and WIndows Devices
+  as well as Android devices in China with Baidu Cloud Push
+
+What is SNS ?
+
+- besides pushing cloud notifications directly to mobile devices,
+  Amazon SNS can also deliver notifications by SMS text messages or email
+  to SQS queues,or to any HTTP endpoint.
+- SNS notifications can also trigger lambda fucntions.When a message is
+  published to an SNS topic that has lambda fucntion subscribed to it
+  the lambda fucntion is invoked with the payload of the published message
+- the lambda fucntion recieves the message payload as an input parameter 
+  and can manipulate the information in the message,publish the message
+  to another SNS topics,or send the message to other AWS services.
+- SNS allows to group multiple recipients using topics.
+- iOS,Android and SMS recipients can be grouped together.
+- to prevent messages from being lost,all messages published to 
+  Amazon SNS are stored redundantly across multiple AZ
+  
+Services -> Messaging -> SNS -> Get Started
+-> Create topic
+   Name:heycloud
+   Description:Cloudvite
+   Click Create Topic
+   
+   Click Create Subscription 
+   Protocol -> HTTP/HTTPS/Email/Email-JSON and so on can be selected
+   Select Email 
+   EndPoint: type recipients 'yourname@gmail.com'
+   Click Create Subscription 
+ 
+Recipient will Get email like this 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AWS Notification - Subscription Confirmation
+Cloudvite no-reply@sns.amazonaws.com via amazonses.com 
+
+You have chosen to subscribe to the topic:
+arn:aws:sns:ap-south-1:425422583174:hey-cloud
+
+To confirm this subscription, click or visit the link below 
+(If this was in error no action is necessary):
+Confirm subscription
+
+Please do not reply directly to this email. If you wish to remove 
+yourself from receiving all future SNS subscription confirmation 
+requests please send an email to sns-opt-out
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You must be seeing 'Pending Confirmation' in the SNS Window
+Once You confirmed it,you get the below message.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Simple Notification Service
+Subscription confirmed!
+
+You have subscribed yourname@gmail.com to the topic:
+hey-cloud.
+
+Your subscription's id is:
+arn:aws:sns:ap-south-1:425422583174:hey-cloud:5692f254-6a64-4496-a1db-9f5e6a425acf
+If it was not your intention to subscribe, click here to unsubscribe.
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Subscription ID  can be seen like this.
+arn:aws:sns:ap-south-1:425422583174:hey-cloud:5692f254-6a64-4496-a1db-9f5e6a425acf
+(Amazon Resource Number - arn)
+
+then on Top, click Publish to Topic
+in the Publish Screen 
+Fillin 'Subject' and 'Message' Field with Heading and message.
+TTL make it as 300seconds ( Time To Live will be 300 seconds,later it will die)
+Click Publish Message, will send email to all Email Addresses who are all
+confirmed earlier
+
+Recipients will get Email like this! in their Mail Box
+
+   Cloudvite no-reply@sns.amazonaws.com via amazonses.com 
+   hey just come in  and enjoy !!
+
+   --
+   If you wish to stop receiving notifications from this topic, please click or visit the link below to unsubscribe:
+   https://sns.ap-south-1.amazonaws.com/unsubscribe.html?SubscriptionArn=arn:aws:sns:ap-south-1:425422583174:hey-cloud:5692f254-6a64-4496-a1db-9f5e6a425acf&Endpoint=yourname@gmail.com
+
+   Please do not reply directly to this email. If you have any questions or comments 
+   regarding this email, please contact us at https://aws.amazon.com/support
+
+_____________________________
+
+Once Testing is over 
+- Delete the Topic
+- Delete the Subscriptions
+______________________________
+
+SNS Benefits
+
+- Instantaneous,push based delivery (no polling)
+- Simple APIs and easy integration with applications
+- Flexible message delivery over multiple transport protocols
+- Inexpensive,pay as you go model with no upfront costs
+- Web based AWS management console offers the simplicity of a 
+  point-and-click interface.
+  
+Difference Between SNS and SQS 
+- both messaging service
+- SNS is Push
+- SQS is Poll (pull)
+
+SNS Pricing 
+- users pay $0.50 per 1 million Amazon SNS Requests
+- $0.06 per 100,000 Notification deliveries over HTTP
+- $0.75 per 100 Notification delivries over SMS
+- $2.00 per 100,000 Notification deliveries over Email
+____________________________________________________________________________________

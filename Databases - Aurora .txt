@@ -1,0 +1,112 @@
+Databases - Aurora
+
+- MySQL Compatible,relational database engine that combines the speed and
+  availability of high-end commercial databases with the simplicity and
+  cost-effectiveness of open source databases.
+- Amzon Aurora provides upto five times of better performance than MySQL at
+  a price point one tenth that of commercial database while delivering similar
+  performance and availability.
+  
+  http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Aurora.html
+  
+Aurora Scaling 
+- Start with 10GB , scales in 10GB increments to 64Tb(storage auto-scaling)
+- Compute resources can scale upto 32vCPUs and 244Gb of memory.
+- 2 copies of your data is contained in each AZ,with minimum of 3 AZ.
+  so 6 copies of data you can have.
+- Aurora is designed to transparently handle the loss of upto two copies of data
+  without affecting database write availability and up to three copies without
+  affecting read availability.
+- Aurora storage is also self-healing.Data Blocks and disks are continously scanned 
+  for errors and repaired automatically.
+
+Aurora Replicas
+- 2 types of Replicas are available
+- Aurora Replicas(currently 15)
+- MySQL Read Replicas (currently 5)
+
+Failover,automatically to Aurora replicas
+but not for MySQL Replicas
+
+Amaon Aurora is NOT FREE anytime, always chanrged!!!
+
+-> Get Started Now -> 
+   - Amazon Aurora - Select
+     DB Engine Version - Aurora Compatible with MySQL 5.6.10a
+	 DB Instance Class - db.t2.micro - 1vCPU,1GB RAM
+	 Multi-AZ Deployment - No
+	 
+	 Settings 
+	 DB Instance Identifier - rdsdbuser
+	 Master Username - rdsdbuser
+	 Master Password - rdsdbuser
+	 Master Password - rdsdbuser
+
+     Failover -> Priority -> tier 0 (15 Available)
+	 Next Step
+	 
+Configure Advanced Settings
+Network & Security 
+	VPC* Default VPC
+	Subnet Group - Default
+	Publicly Accessible - Yes
+	Availability Zone - No Preference
+	VPC Security Group(s) - myRDSsecurityGroup(VPC)
+Database Options 
+    DB Cluster Identifier - rdsdbuser-cluster
+    Database Name - rdsdbuser
+	Database Port - 3306
+	DB Parameter Group - default.mysql5.6
+	Option Group - default.mysql-5.6
+	Copy Tags To Snapshots - DONT CHECK IT
+	Enable IAM DB Authentication - No Preference
+	Enable Encryption - YES 
+Backup,Monitoring,Maintenance  ---> Leave it with Default Settings
+Click Launch DB Instance
+
+Once DB Instance is launched, you can create Replica for it.
+Click on Instance Actions -> Create Aurora Replica
+
+Instance Specifications 
+ DB Instance Class - db.t2.micro - 1vCPU,1GB RAM
+Settings
+ Aurora Replica Source - rdsdbuser(DB-cluster:rdsdbuser)
+ DB Instance Identifier - rdsdbuser-replica
+Network and Security
+ Publicly Accessible - YES
+ Availability Zone - No Preference (Amazon will put it automatically)
+ Failover - Tier 1
+Database Options 
+ Database Port 3306
+Monitoring
+ Enable Enhanced Monitoring - No
+Maintenance 
+ Auto Minot Version Upgrade - YES
+ 
+ Click Create Aurora Replica
+ 
+ In Aurora Dashboard you can see Master Aurora as 'Writer'
+ and Replica you can see as 'Reader'
+  
+ With Cluster Endpoints DNS name we can access to it.
+ 
+ Master will be known with DNS Name as 
+  - rdsdbuser-cluster.cluster.ctyx2qkvjuvc.ap-south-1.rds.amazonaws.com:3306
+ Slave Replica will be known with DNS Name as 
+  - rdsdbuser-replica.ctyx2qkvjuvc.ap-south-1.rds.amazonaws.com:3306
+
+ If Master fails it goes to the Replica.
+ 
+ Removal Procedure
+ - remove/delete Slave Replica Instance first 
+ - then delete the Master DB Instance 
+   - Say NO to 'Do you want to create a Final Snapshot?'
+     and check box 'I Acknowledge.........blah blah....'
+     Click Delete 
+__________________________________________________________________________________________________
+ 
+ 
+ 
+
+  
+

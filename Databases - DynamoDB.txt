@@ -1,0 +1,77 @@
+Databases - DynamoDB
+
+DynamoDB is a fully managed NoSQL database service that provides fast 
+and predictable performance with seamless scalability. 
+DynamoDB allows you to create a database table that can store and 
+retrieve any amount of data, and serve any level of request traffic. 
+
+- most important in the NoSQL model
+- Amazon DynamoDB is fast and flexible NoSQL DB
+- for all applications that need consistent,single digit millisecond latency
+  at any scale
+- fully managed database and supports both document and key-value data models
+- flexible data model and reliable performance make it great for mobile,web,
+  gaming,ad-tech,IoT and many other applications
+- Like a memory stick, there are no moving parts to an SSD (Solid State Drive) 
+  Rather,information is stored in microchips. Conversely,a hard disk drive 
+  uses a mechanical arm with a read/write head to move around and read 
+  information from the right location on a storage platter. 
+  This difference is what makes SSD so much faster.
+  See the link for moer info http://www.storagereview.com/ssd_vs_hdd
+  
+  Stored on SSD Storage 
+  Spread across 3 geographically distinct data centers
+  Eventual consistent Reads (default)
+  Strongly Consistent Reads
+  
+  Eventual consistent Reads (default)
+  - Consistent across all copies of data is usually reached within a second
+    Repeating a read afetr a short time should return the updated data
+	(Best Read Performance)
+	
+  Strongly Consistent Reads
+  - Returns a result that reflects all writes that received a successful reponse
+    prior to the read
+	
+DynamoDB Pricing
+  - Provisioned Throughput Capacity
+    - Write Throughput $0.0065 per hour for every 10 units
+	- Read Throughput $0.0065 per hour for every 50 units
+	- Storage Cost of $0.25GB per month
+
+Configuring DynamoDB
+
+Services -> Database -> DynamoDB
+
+- Create Table 
+  Table name* Classroom
+  Primary Key Student-Id -Number 
+  
+  Table settings -> Use Default Settings
+  Create Table 
+  
+  Select 'Classroom' and Item' from the Tab
+  Create and Item 
+  Student-Id Number 001
+  Append - String - FirstName - User1
+  Click SAVE
+  
+  Create and Item 
+  Student-Id Number 002
+  Append - String - FirstName - User2
+  Append - String - SurName - Live
+  Click SAVE
+  
+  RDS is dynamically adding values/columns and so on
+  here nothing like that.
+  
+  Scan - Filter - SurName - Value -Live , you can search names 
+  like this , it will produce the desired result.
+  then 
+  X table and Start Search , to see all Items in the Table
+  
+  Metrics Tab will give you the Util Graphs
+  Capacity Tab allows you to change the Read Capacity Value and Write Capacity Value
+  
+  Once Verification Completes, Delete the entries and Table.
+________________________________________________________________________________________________

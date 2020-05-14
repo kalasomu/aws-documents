@@ -1,0 +1,40 @@
+VPC Flow Logs for Custom VPC
+
+- to monitor all the logs inbound towards our Custom VPC
+  which are reported by CloudWatch
+- Flow Logs allows to capture the IP traffic on the 
+  network interfaces of the resources we created.
+
+Steps Involved 
+
+- Click on your Custom VPC -> Actions -> Create Flow Logs
+  -> Setup Permissions (on IAM Role)
+     Create New IAM role
+	 Role Name - flowlogsrule 
+	 (PolicyDocumnet you can see in just down)
+     Click Allow
+	 
+	 Go to Management Tools -> CloudWatch -> Logs (let side panel)
+	 -> Create Log Group-> Name -> myCustomVPClogs -> Click Create
+	 
+	 Get back to your Custom VPC-> Actions-> Create Flow Logs
+	 Role -> flowlogsrule
+	 Destination Log Group -> myCustomVPClogs
+	 
+	 Click Create Flow Log 
+	 
+	 
+To Verify the Logs comesin to the 'myCustomVPClogs', it will take time
+
+Go to Management Tools -> CloudWatch -> Logs -> myCustomVPClogs
+   -> Create Log Streams -> Name -> myLOGstream -> Click Create
+	 
+	 Click on the myLOGstream 
+	  - you can see the 'network interfaces' are listed,through these
+	    network interfaces,the logs start flow.
+	 
+	 on the another tabs,try access your WebServer which are in your CustomVPC,
+	 so that the logs will be generated and shown here under the 'myLOGstream' network interfaces
+	  
+
+  

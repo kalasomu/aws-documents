@@ -1,0 +1,218 @@
+Custom VPC Creations
+ - with Public and Private Subnets
+ 
+By Not using VPC Wizard, Lets create VPC Manually and assign 
+Subnets and Security Groups.
+
+VPC Dashboard -> Create VPC
+
+myVPC(10.0.0.0/16)
+Tenancy Default (if select Dedicated,will get charged)
+DNS resolution:yes 
+DNS hostnames:yes 
+(We require 'Public DNS (IPv4)' and 'IPv4 Public IP' for each instance 
+created,so that it can be accessed from the outside world, these two
+settings "DNS resolution" and "DNS hostnames" will solve that)
+
+Alongwith New Custom VPC, Security Group/NACL/Route Table are created automatically
+but no Subnets and Internet Gateways are created.
+
+then Create Subnets
+VPC Dashboard -> Subnets 
+
+Subnets -> Subnet10 (10.0.10.0/24)
+VPC               - myVPC
+Availability Zone - ap-south-1a 
+IPv4 CIDR Block   - 10.0.10.0/24 
+
+Subnets -> Subnet20 (10.0.20.0/24)
+VPC               - myVPC
+Availability Zone - ap-south-1b 
+IPv4 CIDR Block   - 10.0.20.0/24 
+
+(1 Availability Zone = 1 Subnet)
+
+Then We have to create Internet Gateway for this VPC/Subnets
+
+VPC Dashboard -> Internet Gateway -> Create Internet Gateway
+Name: InternetGW-myVPC
+Attach to VPC -> myVPC(10.0.0.0/16)
+(you cannot create another InternetGW and attach to the same VPC
+one VPC one InternetGW)
+
+Now the 'myVPC' has been attached to the InternetGW, but still 
+Subnets wont have it, can chk it by select Subnet10 and Routing Table
+it will show only 10.0.0.0/16,means it can connect to the main subnet only.
+
+Lets Create New Custom Route Table,and attach.
+
+Name - myPublicRoute
+Attach to - myVPC
+and another Routes by Edit
+0.0.0.0/0 - InternetGW-myVPC
+SAVE 
+
+Click Subnet Associations
+Edit 
+Select Subnet10 only and SAVE
+
+VPC Dashboard -> Subnets
+Click Subnet10 
+ - Auto Assign Public IP must be NO, We need to make it to YES so that any instance on this subnet 
+   can have Internet Access 
+ - Click Subnet Actions -> Modify auto-assign-IP Settings Enable Tick and SAVE
+ 
+Then Just Create an EC2 Instance to sit in this Subnet10 (Public)
+
+EC2 Dashboard -> Create Instance -> 
+Network - myVPC(10.0.0.0/16)
+Subnet  - Subnet10(10.0.10.0/24)ap-south-1a 
+Auto-Assign Public IP - Use Subnet Setting(Enable)
+
+Advanced Settings 
+#!/bin/bash
+yum install httpd -y
+yum update -y
+service httpd start
+chkconfig httpd on
+echo "<html><h1>Hello Welcome to Server in Public Subnet10!</h1></html>" > /var/www/html/index.html
+
+Name and Tagging you do then,Make a New Security Group 'myDMZ' with 
+SSH and HTTP enabled.
+
+Click Review and Launch 
+
+once its Launched,chk it on Browser with its DNS Name ,whether homepage loads
+_______________________________________________________________________________________________________
+
+Now lets go and create a New Instance and put it under Private Subnet20 under myVPC
+
+EC2 Dashboard -> Create Instance -> 
+Network - myVPC(10.0.0.0/16)
+Subnet  - Subnet10(10.0.20.0/24)ap-south-1b 
+Auto-Assign Public IP - Use Subnet Setting(disable)
+
+Security Group - myPRIV
+SSH - Custom - 10.0.10.0/24
+ICMP - Custom - 10.0.10.0/24 
+(this Private Subnet20 Server will be accessible by the Public Subnet10 Server Only)
+(We should be able to ping and ssh from Subnet10 Public Server only)
+Review and Launch with Existing Key Pair akramnath
+
+Once its Launched 'click on Subnet20Server' and check NO PUBLIC DNS would be assigned
+(so this Subnet20Server cant be accessed from Outside World,its strictly only for Private Use)
+
+You can ping the Private Server Subnet20 from the PUBLIC Server Subnet10 
+
+_______________________________________________________________________________________________________
+
+Creating NAT for to give Outside World access to the Private Server Subnet20
+
+Using NAT Instance and NAT Gateway we can do this 
+
+VPC Dashboard -> NAT Gateways
+Create NAT Gateway on the Public 10.0.10.0/24 Subnet (always the NAT GW shld be in public subnet)
+then assign a ElasticIP,then SAVE it.
+
+Come to Routing Table creations and make 
+ - a routing table entry 0.0.0.0/0 point to the NAT Gateway , then SAVE it.
+   0.0.0.0/0 nat-0e1c55b67d5053496 - on vpc-8dedb5e4 | myVPC 
+   (in main, not on the 'myPublicRoute' Custom route table enrty)
+   
+   then just do the ssh to the Subnet10 Server as usual.once you logged in try 
+   ping the Server which is in Subnet20. you should be able to ping it, since 
+   the secgroup which is created is allowing only Subnet10 can access it.
+   
+   when you try access through 'ssh' it may ask for the key stuff
+   change the dir to .ssh and create a file using vi editor as 'yourname.pem' and 
+   copy paste the contents of 'yourname.pem' which is in your harddisk.
+   '-----BEGIN RSA PRIVATE KEY-----' to '-----END RSA PRIVATE KEY-----'
+   once you finish save and comeout, then 
+    - chmod 0600 yourname.pem
+	- so that it can be readable 
+	
+	then run this 
+	sudo ssh -l ec2-user 10.0.20.113 -i yourname.pem
+   
+   so you can access the Server in Subnet20 from Subnet10. Since the NAT GW
+   is been created and assigned with the ElasticIP, the Server20 can access the 
+   outside world. try ping 8.8.8.8 and try resolve any websites.it shld be 
+   successful.
+
+[ec2-user@ip-10-0-10-247 ~]$ ping 10.0.20.113
+PING 10.0.20.113 (10.0.20.113) 56(84) bytes of data.
+64 bytes from 10.0.20.113: icmp_seq=1 ttl=255 time=0.868 ms
+64 bytes from 10.0.20.113: icmp_seq=2 ttl=255 time=0.929 ms
+64 bytes from 10.0.20.113: icmp_seq=3 ttl=255 time=0.952 ms
+^C
+--- 10.0.20.113 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2032ms
+rtt min/avg/max/mdev = 0.868/0.916/0.952/0.043 ms
+[ec2-user@ip-10-0-10-247 ~]$
+[ec2-user@ip-10-0-10-247 ~]$ sudo su
+[root@ip-10-0-10-247 ec2-user]# cd .ssh
+[root@ip-10-0-10-247 .ssh]# ls -l
+total 4
+-rw------- 1 ec2-user ec2-user 391 Aug  5 15:44 authorized_keys
+[root@ip-10-0-10-247 .ssh]#
+[root@ip-10-0-10-247 .ssh]#
+[root@ip-10-0-10-247 .ssh]# vi yourname.pem
+[root@ip-10-0-10-247 .ssh]#
+[root@ip-10-0-10-247 .ssh]# chmod 0600 yourname.pem
+[root@ip-10-0-10-247 .ssh]# sudo ssh -l ec2-user 10.0.20.113 -i yourname.pem
+The authenticity of host '10.0.20.113 (10.0.20.113)' can't be established.
+ECDSA key fingerprint is 53:da:8e:be:f0:54:94:e8:07:94:d8:39:22:b1:37:56.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '10.0.20.113' (ECDSA) to the list of known hosts.
+
+       __|  __|_  )
+       _|  (     /   Amazon Linux AMI
+      ___|\___|___|
+
+https://aws.amazon.com/amazon-linux-ami/2017.03-release-notes/
+[ec2-user@ip-10-0-20-113 ~]$
+[ec2-user@ip-10-0-20-113 ~]$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=44 time=58.0 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=44 time=57.8 ms
+64 bytes from 8.8.8.8: icmp_seq=3 ttl=44 time=57.9 ms
+64 bytes from 8.8.8.8: icmp_seq=4 ttl=44 time=57.8 ms
+64 bytes from 8.8.8.8: icmp_seq=5 ttl=44 time=57.9 ms
+64 bytes from 8.8.8.8: icmp_seq=6 ttl=44 time=58.0 ms
+^C
+--- 8.8.8.8 ping statistics ---
+6 packets transmitted, 6 received, 0% packet loss, time 5007ms
+rtt min/avg/max/mdev = 57.859/57.935/58.039/0.156 ms
+[ec2-user@ip-10-0-20-113 ~]$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9001 qdisc pfifo_fast state UP group default qlen 1000
+    link/ether 0a:59:6b:e1:37:88 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.20.113/24 brd 10.0.20.255 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::859:6bff:fee1:3788/64 scope link
+       valid_lft forever preferred_lft forever
+[ec2-user@ip-10-0-20-113 ~]$ nslookup facebook.com
+Server:         10.0.0.2
+Address:        10.0.0.2#53
+
+Non-authoritative answer:
+Name:   facebook.com
+Address: 31.13.77.36
+
+[ec2-user@ip-10-0-20-113 ~]$
+
+_______________________________________________________________________________________________________
+
+- Once All Activity is over, delete the Instances first 
+- then Delete the NAT GW and release the ElasticIP from it.
+- and delete the VPC deleting VPC will delete all associated GW/ACL/SUBNETS/VPN with it.
+- refresh the respective screens and verify all done perfectly to avoid unnecessary billing.
+_______________________________________________________________________________________________________
+
+
+

@@ -1,0 +1,485 @@
+AWS Technical Essentials 
+
+AWS Web Services AWS (2006 its launched)
+- Public cloud
+- Amazon
+- Scalability 
+
+Online Email Services are in Cloud across the devices we can access them
+thats called Software as a Service - SaaS
+
+Pool of resources - HD,Servers,Db,Network Equip,Power,
+Datacenters are constructed for AWS Services
+Resources are shared all over the globe
+
+Rapid Provisioning and Release
+ - new VM can be given in couple of minutes
+ 
+On-Demand
+- every other services are On-Demand Pay as you go!
+- natural gas/electricity are examples,we dont know how its produced
+  but we just pay for how much we are using
+- same AWS also offering services as Computing Resources
+
+Scalability 
+ - its called Elasticity 
+ - Scaling is the ability to change an implementation to respond
+   to keep-on changing traffic patterns
+ - like some festival offers from flipkart/amazon,so that
+   we need to support sudden inflow for resources, so here 
+   the On-Demand comes in place. once the festival is over
+   we dont require those, so it can be released back to the pool
+ - cost effective,no need to buy them,just hire them as you require
+ - Easy On-Ramp 
+
+AWS started these products on these years
+
+2006 - EC2(Elastic Compute Cloud),S3(Simple Storage Service)
+2009 - RDS (Relational Database Service)
+2011 - Elastic Beanstalk
+2012 - Glacier,DynamoDB,RedShift
+2016 - Lambda
+
+_______________________________________________________________________________
+
+AWS Infrastructure and Services 
+
+- Regions (geographically spread- Compute)
+  - Availability Zones (Networking)
+    - Edge Locations (Data Center Storage)
+
+Data can be stored across Availabilitty zones as well
+means they can be physically in the multiple data centers
+all over the globe
+
+So if disaster happens in a Data Center, it can be repliceted 
+in other Data Center, so no single point of failure
+
+AWS Edge Locations 
+ - store the data all over Globe, 
+ - CDN Content Device Network
+ - image cached locally,data pulled in form original place 
+   (from originally data where its been stored across the globe)
+
+
+Platform Services    [Databases]    [Analytics]     {Deployment}         {Mobile}
+                      DynamoDB     Kinesis,EMR     Elastic Beanstalk     Cognito
+                      RDS,RedShift	Data Pipeline	CodeDeploy		 	   SNS
+   
+Foundation Services   [Compute]     [Networking]           [Storage]
+                     EC2,Lambda	   Load-Balancing        S3,Block Storage 
+					 Auto Scaling  	RouteS3,VPC          Glacier,EFS
+                         |               |                   |
+Infrastructure         Regions     Availability Zones   Edge Locations 
+
+_______________________________________________________________________________
+
+AWS Management Console
+
+- 3 ways to connect
+- signing up for AWS
+- brief tour of console
+
+
+Command Line Interface 
+  - shell(linux),command prompt(windows)
+RESTful API
+  - RESTful uses http port 80 with glorified front end 
+    which does the same job as shell/command prompt
+Web Based Console
+  - easiest way to connect
+  - can be used in computer/mobile phone
+
+https://aws.amazon.com
+  - provide email/phone number 
+  - provide the password for admin task
+  - later we create users 
+  - billing details with Credit Card/no charges applied
+    as long as you dont use paid-services
+
+Dashboard Contents
+- Compute,Storage and Content Delivery,Database,Security and Identity,
+  Networking 
+  
+Regions can be selected the near by one
+- Asia Pacific (Mumbai)
+
+Dont use with the root account always, better create a user and use the 
+services as the user created.Since root has got so much privileges.
+
+_______________________________________________________________________________
+
+Intro to EC2 
+ - Infrastructure-as-a-service (IaaS)
+ - virtual machines in the cloud
+ - define and standup virtual machines
+   on amazon's world-class Infrastructure
+ - all fully managed, no need of any maintenance from our side
+
+Features of EC2
+- custom virtual machines
+- OS installed already and install anything on it 
+- fully managed Infrastructure
+- fast provisioning -in minutes
+- elastic scaling is available
+- pre built images available in the cloud for us (AMI)
+- or we can even bring our own BYOD
+- configure network for them to use
+  -subnets/fw/acls need to get configured
+
+IaaS means Pay-As-You-Go
+- Flexible Payment Options
+  - Pay-As-You-Go, Reserved,Scheduled
+  - turnon and turnoff once you dont need it
+    and no need to pay for it
+  - elastic means as per your need Infrastructure can be used
+
+Creating New EC2 Instance 
+- choose region and availability zones
+- choose and image to launch from AMI 
+- choose a machine type - ie CPU RAM
+- configure network,storage and security
+  - once done it will be pending state and then running state
+  - then we can connect using RDP or Shell 
+
+AMI Amazon Machine Images
+- OS, Root Volume Config
+- Images setup for basic config for the VM
+  - Amazon Linux,CentOS,Debian,Ubuntu,Windows,RedHat
+  - can be chosen from the public repository
+  - or we can build on our own images and upload to Market Place
+- EBS backed and Instance backed
+  - root volume stored in elastic block store/AWS provides
+  - instance backed is HD connected to host machine
+    instance backed are much faster 
+- AMI Market Place includes thousands of pre-built images 
+  with popular software configurations/ready to go 
+_______________________________________________________________________________
+
+Storage Options for EC2 Instances
+
+- root volume config
+- instance backed vs EBS backed
+- lifecyle of an instance
+
+Root Volume Config
+- root volume can be stored in this two locations
+- /sda in linux  or c:/ in windows which runs the OS
+- /sda or c:/ can be plaed in 'Instance Store Backed'
+  means HD connected to host machine (like in VMWare)
+  so physical connection can be done to the hosted VM directly 
+  - will have very faster access
+  - and these drives are 'Ephemeral' means 'short lived'
+  - when we stop this instance, it evaporates,disappears
+  - getting recerated once we restart again and data stored in that
+    is not persistant
+
+EBS Backed 
+- moving the root volume out of host machine and placing it in 
+  elastic block store
+- load data to that, and they persistant
+- volumes/data are kept as it is, even its shutsdown
+
+Characteristic   Amazon EBS-Backed                                Amazon Instance Store-Backed 
+BootTime         Usually <1 minute                                Usually <5 minute
+Size Limit       16TB                                             10GB 
+Data Persistence Root Volume is deleted when the instance         data on any instance store volumes persists 
+                 terminates.Data on any other AmazonEBS volumes   only during the life of the instance 
+				 persists after instance termination 
+Charges          Instance Usage,Amazon EBS Volume usage,and       Instance usage and storing AMI in Amazon S3 
+                 storing AMI as an Amazon EBS snapshot
+StoppedState     Can be Stopped                                   Cannot be Stopped 
+				 
+  
+
+LifeCycle of EC2 Machine
+
+On Instance Backed 
+AMI -> Launch  -> Pending -> Running 
+                             can be rebooted 
+                             come back as running,no issues
+                             stop/shutdown and terminate
+                             root volume disappear/evaporates
+						 
+On EBS-Backed 
+AMI -> Launch  -> Pending -> Running 
+                             can be rebooted 
+                             come back as running,no issues
+                             stopped/shutdown and terminate
+							 while stopped config changes possible
+                             root volume disappear 
+							 can override delete option
+							 dont delete root volume 
+							 re attaching to that is possible 
+________________________________________________________________________________________________
+
+AWS Simple Storage Service S3
+- OneDrive,Dropbox,GoogleDrive.Amazon Cloud Drive are examples
+- can be accessed anytime from anywahere
+- Amazon Cloud Drive is running on S3
+- accessed via https:// connection 
+- these are built for large data ,unstructured binary data 
+- and its not a database
+- no indexing,no search capability is possible 
+- media,images,video,sound,html,txt,doc files can be stored
+- scalable,limitless,durable (99.99999999)
+- never get lost 
+- shared multi tenent model
+
+
+Features of S3
+- Access via REST or SOAP
+  URL starts with bucket,domain name,and file name in last
+  https://bucket.s3.amazonaws.com/objectname.ext
+- unlimited number of objects can be uploaded
+  each upto 5TB in size 
+- Secure data with Client-Side and can be streamed to AWS or AWS Provided
+  Server-Side Encryption with AES-256
+- Bucket and Object Level Access Logs 
+  for auditing regulatory compliance
+  
+S3 Use Cases
+- AMIs can be stored inside S3
+- can store a website, as a webserver it can deliver a webpage
+- pay for only what you use
+  - zero minimum or no startup costs
+  - free inbound traffic/outbound(download) is charged
+  - accrues hourly 
+  - class specific pricing 
+________________________________________________________________________________________________
+
+AWS S3 Concepts
+
+AWS S3 Architecture
+AWS S3 Buckets and Objects
+AWS S3 Security Options
+
+- inside the accounts S3 Services are
+- buckets(like folders/directories) belongs to accounts 
+- in buckets can be uploaded with data 
+- and they called as objects
+- accounts can have up to 100 buckets
+- buckets may have unlimited objects
+
+Buckets are top level containers for data (ie objects)
+Buckets exists in global namespace
+ - globally unique,cant be duplicated
+Buckets are created in a Region
+ - it shld be inside a region 
+Buckets can not be nested
+ - like how the sub directories made in FS
+Usage/Charges can be aggregated by Bucket
+ - usage changes as bucket level 
+
+Objects are Discrete Data/Files
+- between 0 to 5TB
+Objects can be versioned
+- no limit to the number of them 
+- upload newer copy will get new versions
+- managed by AWS
+- backups are done as per versions
+Bucket+Object+(option)Version maps to unique URL
+- static s3.amazonaws.com never changes 
+- objectname.ext is the object we have stored as file
+
+https://bucket.s3.amazonaws.com/objectname.ext
+https://bucket.s3.amazonaws.com/a/objectname.ext
+
+a/objectname.ext -> a is not a folder, its a whole name 
+for an object key
+
+AWS S3 Security 
+- Access Control at Bucket level and Object Level is possible
+  - whole bucket level or just an object level ACL possible 
+  - ACLs can be written to control who can access it
+  - Identity and Access Management (IAM) Policies 
+     - users can be created accordingly and access can be given 
+  - Bucket and Object Policies can be defined with 
+    Access Policy Language (JSON)
+- Encryption at REST with AES-256 provided by AWS on Bucket and Objects 
+  or BYO (bring your own)and encrypt before uploading to AWS S3
+________________________________________________________________________________________________
+
+Advanced S3 Features
+
+- S3 Versioning 
+- Object Storage Classes
+- LifeCycle Management
+
+- store multiple versions of a file which are uploaded
+- object versioning once activated
+   - whenever new version loaded,older versions 
+     will go behind, new version will be up in the list
+- Versioning set at the Bucket Level
+- Existing Objects have Null Version 
+- New Objects assiged with new version ID 
+- all versions are retained (cost associated for every other 
+  old version of a file)
+- they will reamin even after delete
+- if a object versioned object is deleted, a delete flag has been 
+  put on that object and kept
+
+Storage Classes
+
+- different class for every object 
+- standard(default),Infreq Access,Glacier,Reduced Redundancy RRS
+- infrequent data is Glacier (not so frequently accessed)
+- cheap option is Glacier,for to keep the file intact
+- RRS highly avail,not durable,no guarantee
+
+LifeCycle Management
+- object level and bucket level is possible
+  initial upload -> 30 days -> 1 Year
+  initial upload -> 180 days -> 2 Year
+- custom rules can be written for the object and buckets
+  to move between classes discussed
+_______________________________________________________________________________
+
+AWS Shared Responsibility Model
+
+- Shared Responsibility 
+- Physical Security
+- hardware,software,network
+
+Security is Everyone's Business
+
+We(as customer) are responsible for the data which is IN the cloud
+AWS is responsible for the data OF the cloud
+
+AWS 
+- data centers are kept in non descript,and undisclosed locations
+- 24/7 security staff control that 
+- two factor auth for entry
+- continual monitoring logging and auditing
+
+Hardware,Software and Network
+- automated change control process
+- physical access requires authorization with 
+  frequent renewal
+- Bastion Servers act as gatways for privileged access
+  - logged monitored and make cut off decision based on access 
+- Network boundary devices monitor and audit access
+  - only authorzied access given to network
+- unusual or abnormal activity monitor application usage,  
+  intrusion,malicious attacks etc.
+- regulatory compliance is met by AWS
+_______________________________________________________________________________
+
+
+AWS Access Management
+- Identity and Access Management
+- Users,Groups and Roles
+- IAM Policies
+
+- Username and login handled by IAM
+- the one which is cearted as 1st is automatically assigned as 'root' user 
+- we have to create a users with certain privileges,
+- not recommended to utilise as 'root' since root has got skylimit access
+
+Create Users (AKA Identities)
+Assign Permissions to Users
+Create Groups and Roles
+Assign Permissions to groups and roles
+
+first Users then Groups then roles and finally Policies
+
+IAM Users 
+- loginname/pwd, group membership,polices and access keypair
+  given to user 
+- unique sign in URL for that user 
+- password polices/self service password reset/multi-factor authentication
+  MFA - is setup with token (like RSA handheld token)
+- 2 keypairs  
+  deactivate/delete/cerate at any time for key refresh
+  
+IAM Group 
+- users inside the group 
+- name given and polices set for all users inside
+- easy manage as normal OS like
+- users gain membership permanently 
+- physically removing user removes his polices and membership
+
+IAM Roles
+- inherit the polices from the roles they assigned 
+- 'trusted entities' 
+- roles are temporary 
+- polices are not cumulative, entities giveup 
+  old permissions when assuming new role
+
+IAM Policies
+- Permissions assigned to users/groups/roles
+- name/description/permissions/resources are in JSON style 
+- polices generator helps to write the JSON document
+- managed policies,custom polices,inline polices = 3 types of polices
+  - managed polices are AWS provides (for ex for S3 admins) can be 
+    assigned to certain groups/users as well 
+  - unique mixture of the polices/access on Custom Policies
+    even user/group is deleted,it remains
+  - inline associated with particular user/group,policy 
+    may get deleted once the user/group is deleted
+_______________________________________________________________________________
+
+AWS Relational Database Services RDS
+
+- Structure and Unstructred data
+- Amazon Relational DB Service
+- Disaster Recovery and Encryption
+
+Data Storage Considerations
+- Data Format
+- Size
+- Query Frequency
+- Write Frequency
+- Access Speed
+
+Unstructred or Blob Storage - EBS and S3 
+- no search 
+- no query 
+- taking an EC2 and create a DB and host it in the EBS
+  that we can do and its possible , DB on Cloud
+- every other responsibility is on us
+  
+Relational Database
+- DBaaS - Database as a Service
+- SQL DBaaS - SQL engines can be chosen 
+  Aurora,MySQL,POstGress,MariaDB,Oracle,SQL Server are supported
+  all db created as db instances
+- Resizable capacity,hand-off administration,secure,reliable and durable
+- Simple and fast to deploy
+- cost effective
+- compatible with applications
+- manages common database administrative tasks
+- Secure
+- Simple and Fast to scale
+
+Backup
+- automated backup is turned on 
+- daily during backup-windows
+- config 0 to 35 days
+- point in time recovery available
+- geo replicated
+  it can be replicated in different region as well 
+  so not to loose any data during outage
+  
+Manual Snapshots are possible
+- user initiated
+- persisted in S3 
+  pay for the duration,as long as you like it
+  keepit until delete 
+- only recoverable to point snapshot is taken
+
+Shared Security
+- Amazon Compliance is in place
+- RDS Encryption 
+  -built-in easy on/off
+- AT-Rest Encryption
+  -DBS
+  -Backups/Snapshots 
+  -Replicas
+- Uses AWS Key Management
+  -store keys in different place
+Transparent Data Encryption
+- MS SQL Server and Db
+Engine Specific
+- users,roles etc
+_______________________________________________________________________________

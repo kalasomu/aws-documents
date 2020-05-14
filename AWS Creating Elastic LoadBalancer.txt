@@ -1,0 +1,150 @@
+Elastic LoadBalancer EC2
+
+To Create a LoadBalancer we need 
+ VPC,Subnets,Route Table
+ Internet Gateway
+ Security Groups
+ Instances(on Diff Availability Zones)
+ 
+Create VPC
+   Name: VPC-for-LB01
+   IPv4CIDR:192.168.0.0/16 
+   DNS resolution:yes 
+   DNS hostnames:yes 
+ 
+Create Subnets
+   Name : Subnet10-for-LB01
+   VPC: VPC-for-LB01
+   Availability Zones :ap-south-1a
+   IPv4CIDR Block :192.168.10.0/24
+ 
+   Name : Subnet20-for-LB01
+   VPC: VPC-for-LB01
+   Availability Zones :ap-south-1b
+   IPv4CIDR Block :192.168.20.0/24
+   
+Create Route Table 
+   Name : RT-for-VPC-LB01
+   Subnet Associations: Subnet10-for-LB01 192.168.10.0/24 
+                        Subnet20-for-LB01 192.168.20.0/24  
+   
+   Add route : 0.0.0.0/0 igw-a2f16acb 
+   
+Create Internet Gateway
+   Name : InGW-for-VPC-LB01
+   Attached VPC ID:VPC-for-LB01 
+ 
+Create Security Groups
+  Name : Sec-Group-for-LB01
+  VPC : VPC-for-LB01
+  Inbound Rules
+  HTTP (80) TCP (6) 80 0.0.0.0/0, ::/0 
+  SSH (22) TCP (6) 22 0.0.0.0/0 
+  HTTPS (443) TCP (6) 443 0.0.0.0/0, ::/0
+[Always create Security Group before making Instances]
+
+Create Instances
+  Launch Instance -> Free Tier Only
+  Configure Instance Details 
+  Network :  VPC-for-LB01 
+  Subnet : ap-south-1a
+  AutoAssign Public IP : Enable
+  Tenancy : Shared- Run as a shared hardware instance
+  Network Interfaces: Default
+  Advance Details : (to run a Apache WebServer inside the Linux)
+#!/bin/bash
+yum update -y
+yum install -y httpd24 php56 mysql55-server php56-mysqlnd
+service httpd start
+chkconfig httpd on
+groupadd www
+usermod -a -G www ec2-user
+chown -R root:www /var/www
+chmod 2775 /var/www
+find /var/www -type d -exec chmod 2775 {} +
+find /var/www -type f -exec chmod 0664 {} +
+echo "<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
+
+[Repeat the same step for another Instance in ap-south-1b]
+
+Configure Security Group
+ Select an existing security group : Sec-Group-for-LB01
+ 
+ 
+KeyPair 
+ Choose an existing KeyPair : akramnath
+
+Instances : WebServer-Subnet10 
+Public DNS (IPv4):ec2-13-126-78-111.ap-south-1.compute.amazonaws.com
+IPv4 Public IP: 13.126.78.111
+ 
+Instances : WebServer-Subnet20 
+Public DNS (IPv4):ec2-35-154-52-20.ap-south-1.compute.amazonaws.com
+IPv4 Public IP: 35.154.52.20  
+  
+  
+EC2 Dashboard -> Load Balancing -> LoadBalancers
+-> Create LoadBalancer -> Application Load Balancer (Preferred for HTTP/HTTPS)
+ - click continue
+ - name LoadBal01
+ - Scheme - internet-facing
+ - IP address Type - IPv4
+ 
+Listeners 
+ HTTP 80
+   [Omit any warinings given by AWS,Secure Access not available like]
+   (if HTTPS 443 is enabled we require SSL/TLS Certificate)
+   
+Availability Zones
+ VPC-for-LB01 
+ ap-south-1a
+ ap-south-1b
+
+Configure Security Groups
+ Sec-Group-for-LB01
+ 
+Configure Routing
+ Target Group Name : LB01-Route
+ Protocol : HTTP
+ Port : 80
+ Health Checks
+ Protocol HTTP
+ Path /
+ 
+Register Targets 
+ WebServer-Subnet10
+ WebServer-Subnet20
+ Click Add to Registered
+ 
+ Click Create
+ 
+ LB01 will be on Provisioning for a While,Later it will bcome ACTIVE
+ (if not coming as ACTIVE and takes so long,refresh the LB01 once)
+ then you can copy/paste DNS name to browser and verify whether you get the
+ default Apache Server HomePage
+ 
+ http://lb01-150791214.ap-south-1.elb.amazonaws.com/
+ 
+C:\Users\ramna>nslookup
+
+> lb01-150791214.ap-south-1.elb.amazonaws.com
+Address:  192.168.1.1
+
+Non-authoritative answer:
+Name:    lb01-150791214.ap-south-1.elb.amazonaws.com
+Addresses:  13.126.96.213
+            52.66.92.131
+
+>
+ 
+_____________________________________________________________________________________
+
+Once Verification Done,delete all of them,running them will cost you.
+
+- delete LoadBalancer LB01
+
+then delete Instances/terminate
+     delete VPC-for-LB01 
+	 - will delete automatically all related
+	   subnets,internet gateways.
+_____________________________________________________________________________________

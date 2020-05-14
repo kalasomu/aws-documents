@@ -1,0 +1,67 @@
+Identity and Access Management IAM 101 
+
+- IAM Allows to manage users and their level of access to the AWS console
+- comes in security section,appears in Architect Asso Exam and Devops Asso Exam also
+- centralized control of your AWS account
+- shared access to your AWS account
+- granular permisssions 
+- Identity Federation (including AD,Facebook,Linkedin etc)
+  (Single Sign On is possible for to resources also)
+- MultiFactor Authentication is to secure AWS account 
+- provide temporary access to users/devices and services when necessary
+- allows to setup own passwd rotation policy
+- integrates with many diff AWS services
+- Supports PCI DSS Compliance
+
+  Users - End Users
+  Groups - collection of Users under one set of permissions
+  Roles - create roles and can then assign them to AWS resources
+  Policies - Document that defines one (or more permissions)
+  
+  
+  Select the Region Closest to you ! (actually IAM is Global!)
+  -> Security Identity and Compliance -> IAM
+  IAM Users Sign in Link is 
+  https://178532356.signin.aws.amazon.com/console 
+  (number 178532356 is your AWS Account Number assigned to you! 
+  can chk that by clicking your name and My Account)
+  So customize it with your company name  
+ 
+  Root account is the 'EmailAddress' we use to sign on to the AWS
+  Root account gives unlimited access to the cloud
+  We dont want all employees to have Root Level Access to work with cloud
+  
+  So we need to create users inside the AWS and assign roles
+  
+  -> Activate MFA on your root account
+     - this needs to be done,since if someone finds ur email and pwd they can 
+	   compromise your account
+	 - so physical access can be done with this MFA with mobile
+	 
+  -> Manage MFA -> Virtual MFA Device and 
+                   Physical MFA Device 
+				   
+				   Select Virtual MFA Device -> next step
+				   Google Authenticator can be downloaded and installed in ur cellphone
+				   then you will get a QR Code on the PC screen
+				   this QR Code needs to be scanned by the phone
+				   
+				   Authentication Code 1
+				   Authentication Code 2 should be filled in 
+				   then click Activate MFA 
+				   
+				   Successfully associated!
+				   
+Better you can create the Group and Pull Users to the group
+that way we can assign the proper permissions to bunch of users
+
+frmo the Left Side Panel we can select 
+Dashboard,Groups,Users,Roles,Policies,Account Settings, and So on
+
+Roles -> Create New Role 
+________________________________________________________________________________________
+
+	
+	   
+  
+  

@@ -1,0 +1,73 @@
+Databases 
+
+In Amazon we can get 
+- RDS(OLTP),DynamoDB(No SQL),Elasticache,RedShift(OLAP),DMS 
+
+- RDS(OLTP) Relational Databases are 
+  - SQL
+  - MySQL
+  - PostfreSQL
+  - Oracle
+  - Aurora
+  - MariaDB
+- DynamoDB
+   - No SQL
+RedShift
+   - OLAP
+Elasticache
+   - MemCached
+   - Redis
+
+- Relational Databases
+  - databases
+  - tables
+  - row -> each row is a record
+  - fields (columns)
+
+Non Relational Databases
+- MongoDB,JSON/NoSQL
+
+  Collection = Tables
+  Document = Row
+  Key Value Pairs = Fields
+  
+Whats Data WareHousing ?
+ - used for business intelligence
+ - tools like Cognos,Jaspersoft,SQL Server,
+   reporting services,Oracle Hyperion,SAP NetWeaver
+ - used to pull in very large and comple data sets.
+ - usually used by management to do queries on data 
+   (such as current performance vs targets etc)
+
+OLTP vs OLAP
+ - OLAP differs from OLTP in terms of ueries they run
+ - OLTP Example -> Order Number 2120121
+   pulls up a row of data such as Name,date,address to deliver to,
+	delivery status etc
+ - OLAP transaction Example: Net Profit for EMEA and Pacific for Radio Product
+   pulls in large number of records
+   
+ Data WareHousing databases use diff type of architecture both for a databases
+ perspective and infrastructure layer.
+ 
+Elasticache 
+ - Elasticache is web service that maes easy to deploy,operate,and scale an 
+   in-memory cache in the cloud.
+ - this service imporves the performance of web applications by allowing you 
+   to retrieve information fast, managed,in-memory caches, instaed of relying
+   entirely on slower-disk based databases.
+ - Elasticache supports two open-source in-memory caching engines
+   - MemCached
+   - Redis
+
+DMS - Data Migration Service
+ - Allows to migrate the production databases to the AWS
+ - Once Migration started,AWS manages all the complexities of the migration
+   process like data type transformation,compression,and parallel transfer
+   (for fast data transfer)
+ - while ensuring the data changes to the source database that occur during the migration
+   process are automatically replicated to the targets
+ - AWS Schema conversion tool automatically converts the source database schema and 
+   majority of custom code,including views,stored procedures,and functions,to a format 
+   compatible with the target database.
+ - Costlier Oracle Databases can be converted to the less cost/minimum cost db in AWS

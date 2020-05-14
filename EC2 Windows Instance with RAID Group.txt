@@ -1,0 +1,61 @@
+EC2 Windows Instance with RAID Group
+
+Creating RAID Volumes and Snapshots
+
+RAID - Redundant Array of Independent Disks
+   - RAID 0 - Striped,No Redundancy,Good Performance
+   - RAID 1 - Mirrored,Redundancy
+   - RAID 5 - Good for reads,bad for writes,AWS doesn't recommend ever putting RAID 5's on EBS
+              they are Good in real world,but not in AWS
+   - RAID10 - Striped and Mirrored,Good Redundancy,Good Performance
+   
+Manke a Security Group should have a RDP 3386 Port Opened for the Windows Instances
+While Creating the Windows Instance, on the Step 4 'Add Storage'
+Click 'Add New Volume'
+and Add Extra Volumes of your choice 
+  - for ex 4 new Volumes of 8GB Disk Space (SSD)
+  - Very Important, these additional Volumes are CHARGED, and NOT FREE
+  - then all steps are as usual,and make it sure you have selected the RDP enabled Security Group
+  - and if you like you can create,additional KeyPair for this Windows Instance
+  
+Once Windows Instance Launched, try to RDP and Login to Windows Server
+(typing 'mstsc' will bring up the RDP window from your Management PC)
+
+Once you Logged in to the Windows,in Desktop you can chk with File Manager
+that All new Volumes will appear as New Drives as D,E,F,and G
+
+Inside Windows Server, Right Click the 'Start' button and Select 'Disk Management'
+Disk 1,2,3,4 all will be shown and they are EBS Volumes.
+
+Right Click on the Disk 1,and delete the Volume, and repeat the same for all other Volumes also.
+We will be creating Striped Volumes.
+
+Click on Deleted/Unallocated Disk 1, and Right Click and Select 'New Striped Volume'
+Click Next and Add all Volumes which are in Available Screen to the Selected Screen
+Then Format them with the NTFS File System.
+
+Convert 'Basic Disk to the Dynamic Disk',say 'YES' to the Dialog Box.
+Once the Coversion is over, we can see all 4 Volumes will be shown as 'D' only.
+and To Increase the Disk I/O,We Create this Striped RAID Volumes. And they will be 
+much faster than the Normal Disks.
+
+To Take Snapshots of a RAID Array
+
+- Problem - take a Snapshot,the Snapshot excludes data held in the cache by applications
+            and the OS.This tends not to matter on a single volume,however using multiple
+			volumes in a RAID Array,this can be a Problem due to interdependencies of the Array.
+
+- Solution - Take an application consistent snapshot
+
+  - Stop the application from writing to disk
+  - Flush all caches to the disk
+  
+    - to do these,three ways are there
+	  - freeze the file system
+	  - unmount the RAID Array
+	  - shutting down the associated EC2 Instance(this would be the easiest one)
+  
+ Further Reading You can refer these link    
+ http://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/raid-config.html - for Windows RAID
+ http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/raid-config.html - for Linux RAID
+   

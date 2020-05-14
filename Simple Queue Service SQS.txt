@@ -1,0 +1,81 @@
+Application SQS Simple Queue Service
+
+- Fully Managed message queueing system
+- reliable communication between distributed software component
+  and microservers at any scale
+- decouple application components so they run and fail independantly.
+- Exchange messages between any number of systems at any volume
+  and without loss
+- no overhead of managing dedicated messaging,software and infrastructure 
+- helps ensure the order messages are placed in queue match the order
+  they are retrieved
+- FIFO Queueing design for systems dependent on receiving messages in 
+  exact order and exactly once, such as finance and ecommerce applications
+- FIFO Queueing can help in mobile banking transactions and processing 
+  in correct order, and online retail order such as flipcart/amazon.
+
+- Older than EC2
+- SQS is web service that gives you access to a message queue
+  that can be used to store while waiting for a computer to 
+  process them
+- Amazon SQS is a distributed queue system that enables web 
+  service applications to quickly and reliably queue messages
+  that one component in the application generates to be 
+  consumed by another component.
+- A queue is temporary repository for messages that are 
+  awaiting processing
+- Using Amazon SQS,you can decouple the components of and
+  application so they run independantly,with Amazon SQS 
+  easing message management between components.
+- Any Component of a distributed application can store messages
+  in a fail-safe queue
+- messages can contain upto 256kb of text in any format.
+- any component can later retireve the messages programmatically
+  using the Amazon SQS API.
+  
+What is SQS
+
+- the queue acts as a buffer between the component producing
+  and saving data,and the component receiving the data for 
+  processing.
+- this means the queue resolves issues that arise if the 
+  producer is producing work faster than the consumer can
+  process it,or if the producer or consumer are only intermittenly 
+  connected to the network.
+- Amazon SQS ensures delivery of the each message at least once,and 
+  supports multiple readers and writers interacting with the same 
+  queue.
+- A single queue can be used simultaneously by many distributed 
+  application components,with no need for those components to 
+  coordinate with each other to share the queue.
+   
+SQS Example
+
+1- Asynchronously pulls the task messages from the queue
+2- retrieves the named file
+3- processes the conversion
+4- writes the image back to Amazon S3
+5- writes a task complete message to another queue
+6- deletes the original task message
+7- checks for more messages in the worker queue
+
+SQS Tips
+
+- does offer FIFO
+- 12 hours visibility timeout
+- Amazon SQS is engineered to provide 'at least once' delivery of
+  all messages in its queues. Although most of the time each
+  message will be delivered to your application exactly once, you 
+  should design your system so that processing a message more than once
+  doesnt create any errors or inconsistencies
+- 256KB message size now available
+- billed at 64kb 'chunks'
+- 256KB message will be 4x64kb 'chunks'
+- first 1 million Amazon SQS requests per month are free
+- $0.50per 1 million Amazon SQS requests per month thereafter
+- each 64kb chunks of payload is billed as 1 request,
+  for example single API call with 256KB payload will be billed
+  as four requests
+
+For Further Info 
+https://aws.amazon.com/sqs/

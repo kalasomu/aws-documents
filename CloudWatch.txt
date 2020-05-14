@@ -1,0 +1,63 @@
+CloudWatch
+
+Dashboards- Creates Awesome dashboards to see what is happening with your AWS Environment
+Alarms - Allows you to set Alarms that notify you when particular thresholds are hit
+Events -CloudWatch Events helps you to repsond to state changes in your AWS resources.
+Logs - CloudWatch Logs helps you to aggregate,monitor,and store logs.
+
+- Used for Monitoring Purpose of every other devices inside the AWS cloud.
+- when we create a Instance must have noted that under the 'Configure Instance details' Section
+  - Moniroring -> Enable CloudWatch detailed Monitoring
+    - this will get charged heavily, so avoid at any cost.
+	- and this is not included in the FreeTier
+	- chk this link for further reading 
+	  https://aws.amazon.com/cloudwatch/pricing/
+    - Detailed Monitoring for Amazon EC2 Instances
+      - $2.10 down to $0.14 per instance per month at 1-minute frequency******
+	- Amazon CloudWatch Dashboards $3.00 per dashboard per month
+
+Services -> CloudWatch -> Create Dashboard
+  Name -> My Overview
+       -> Select a widget type to configure and add to this dashboard.
+	   -> Line,Stacked Area,Number,Text
+	   -> 374 Metrics will get displayed for 'Application ELB,DynamoDB,EBS,EC2,RDS' Sections
+	   -> choose you want to start with for ex. EC2
+	   -> Select CPU Utilization -> Create Widget
+	   -> in the main Dashboard 
+	      Click Actions -> Period Must be in Auto you can change Freq as per your need
+		  1 Second to 1 Day Options Available 
+	   -> Add Widget to create more Widgets like this and save Dashboard
+	      so that while you come back you can see all Graphs as per the Widgets Created.
+
+Services -> CloudWatch -> Events 
+     - Automatically invoke an AWS Lambda function to update DNS entries when an event notifies you 
+	   that Amazon EC2 instance enters the Running state
+     - Direct specific API records from CloudTrail to a Kinesis stream for detailed analysis of 
+	   potential security or availability risks
+     - Take a snapshot of an Amazon EBS volume on a schedule
+
+Services -> CloudWatch -> Logs 
+      - Monitor HTTP response codes in Apache logs
+      - Receive alarms for errors in kernel logs
+      - Count exceptions in application logs
+
+Services -> CloudWatch -> Alarms
+      - Create Alarms - EC2 Metrics -> Per Instance Metrics
+	    -> tick CPU Utilization -> Click Next 
+		Name - CPU Utilization > 80%
+		Description - CPU Utilization > 80%
+		Whenever:CPUUtilization
+		is >= 80%
+		for - 1 Consecutive Period(s) 
+		  - you can see the Period is on the right side its '5 Minutes'(you can change as per ur need)
+        
+		Actions
+        Define what actions are taken when your alarm changes state. 
+        Whenever this alarm: State is Alarm
+		Send notification to: myemail@mydomain.com 
+
+Once all done and tested as usual,delete all Widgets and Dashboards you created
+Else running so on,will charge you
+
+
+	 

@@ -1,0 +1,258 @@
+Migrations on AWS
+
+Importing CentOS Linux VM into AWS EC2 Cloud
+
+1 Download AWS CLI
+2 Install AWS CLI
+3 Get your access keys
+4 test your access
+5 export the virtual machine
+6 import the virtual machine
+7 access the virtual machine
+
+Download the AWSCLI64 from the Link below
+
+http://docs.aws.amazon.com/cli/latest/userguide/installing.html
+http://docs.aws.amazon.com/cli/latest/userguide/awscli-install-windows.html
+
+
+Choose any version as you like (around 10MB file)
+from this link https://s3.amazonaws.com/aws-cli/AWSCLI64.msi
+
+Download the AWS CLI MSI installer for Windows (64-bit)
+Download the AWS CLI MSI installer for Windows (32-bit)
+Install the downloaded Version
+
+Verify the version installed 
+C:\>aws --version
+aws-cli/1.11.152 Python/2.7.9 Windows/8 botocore/1.7.10
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+and install latest Python also from the link (Python/2.7.9,latest 3.6.2)
+(around 30MB file)
+https://www.python.org/downloads/release/python-362/
+while Installing click 'Add Python 3.6 to PATH'
+
+after installing verfiy the version of Python
+C:\>python
+Python 3.6.2 (v3.6.2:5fd33b5, Jul  8 2017, 04:57:36) [MSC v.1900 64 bit (AMD64)] 
+on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> help ()
+Welcome to Python 3.6's help utility!
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Login to the AWS console and Click your name 
+and Select 'My Security Credentials'
+
+Proceed with Any Warnings
+Click 'Access keys (access key ID and secret access key)'
+and 'Create New Access Key'
+    'Show Access Key'
+	 and Download it 'rootkey.csv' file
+	 Once you open you can see 
+	  1 AWS Access Key ID
+	  2 AWS Secret Access Key
+
+C:\>
+C:\>aws configure
+AWS Access Key ID [****************PH7Q]:
+AWS Secret Access Key [****************+BxO]:
+Default region name [ap-south-1]: ap-south-1
+Default output format [None]:
+
+C:\>aws ec2 create-security-group --group-name MIGRATEST --description "testing the migration group"
+{
+    "GroupId": "sg-e246c88a"
+}
+C:\>
+
+After Creating the Security Group,chk it in EC2 Dashboard
+EC2 Dashboard -> Security Groups = You can see the MIGRATEST is created.
+- Now the AWS CLI has been successfully configured.
+
+Install CentOS as Minimal Install in VMWare Workstation,
+so that size will be around 500MB to get uploaded to the AWS S3 Bucket.
+
+Now We can prepare for the CentOS MiniVM to be migrated to the AWS cloud
+- if you have installed any VMWare Tools for the VM,pls uninstall it
+- we should create a user that will be used for remote access in the Linux VM
+  #adduser remoteguy
+  #passwd remoteguy 
+  
+run all these under CentOS7-Mini
+[root@centos ]#
+yum install httpd -y 
+systemctl start httpd
+systemctl enable httpd
+firewall-cmd --add-service=ssh --permanent 
+firewall-cmd --add-service=http --permanent
+firewall-cmd --reload
+[root@centos ]#
+
+Verify with these that all modules are loaded
+[root@centos ]#
+systemctl status httpd
+firewall-cmd --list-all 
+[root@centos ]#
+
+Make 'NETWORKING=yes' under this 'network' file and save it
+ /etc/sysconfig/network
+ NETWORKING=yes
+
+ then getin to '/etc/sysconfig/network-scripts/'and 
+ edit 'ifcfg-eth0' file to have DHCP options and save it 
+[root@centos network-scripts]# cat ifcfg-eth0
+DEVICE=eth0
+BOOTPROTO=dhcp
+ONBOOT=yes
+[root@centos network-scripts]#init 0
+
+In VMWare Workstation,Shutdown the CentOS MiniVM and click File->Export to OVF 
+You can find three files will be created as CentOS.vmdk/ovf/mf
+all needs to be uploaded to S3 Bucket for safe !
+
+Download S3Browser from http://s3browser.com/ 
+ it will help us to to upload the CentOS MiniVM from the Local Management Computer
+ to the S3 Bucket 
+
+- Once S3Browser is installed in the system,start it
+- it requires AWS Access Key ID and AWS Secret Access Key
+  - fillin the details you got from the AWS Site.
+  - and select 'Amazon S3 Storage'
+- You can even create a bucket from this S3Browser.
+- Click Upload Files,and show path in local computer folder to upload 
+  necessary ova/ovf/ files of the CentOS VM. 
+  (better you upload all vmdk/ovf/mf files)
+  
+Now Just Signin to the AWS Console and click IAM
+- need to create a role as 'vmimport' and assign Administrative Rights
+- Click Roles' and Create Role 
+- AWS Service -> EC2 -> 
+  Select Your case -> EC2 (allows EC2 Instances to call AWS services on ur behalf)
+- Click Next Permissions
+  -> Select AdministratorAccess -> Next Review 
+  -> Role Name -> vmimport 
+  -> Create Role 
+  -> Click on the 'vmimport' and goto 'Trust Relationships' Tab
+     Click 'Edit Trust Relationship' 
+	 In the Policy Document remove "ec2.amazonaws.com"
+	 and make it "vmie.amazonaws.com"
+	 then put a comma after the line "Action": "sts:AssumeRole",
+	 and paste the below text
+	 
+	 "Condition":{
+"StringEquals":{
+"sts:ExternalId":"vmimport"
+}
+}
+     then click 'Update Trust Policy'
+	
+then Just come back to Management PC and edit a file with extension 'json' as this
+[
+  {
+    "Description": "CentOS7-Mini",
+    "Format": "vmdk",
+    "UserBucket": {
+        "S3Bucket": "mymigrate",
+        "S3Key": "CentOS7-Mini.vmdk"
+    }
+}]
+
+then from the same directory(where the 'json' file exists) run this 'lengthy command' 
+
+C:\Migration -EC2-Linux>aws ec2 import-image --cli-input-json "{ \"Description\":\"CentOS Mini\",\"DiskContainers\":[{\"Description\":\"CentOS Mini\",\"UserBucket\":{\"S3Bucket\":\"mymigrate\",\"S3Key\":\"CentOS7-Mini.vmdk\"}}]}"
+{
+    "Status": "active",
+    "Description": "CentOS Mini",
+    "SnapshotDetails": [
+        {
+            "UserBucket": {
+                "S3Bucket": "mymigrate",
+                "S3Key": "CentOS7-Mini.vmdk"
+            },
+            "DiskImageSize": 0.0
+        }
+    ],
+    "Progress": "2",
+    "StatusMessage": "pending",
+    "ImportTaskId": "import-ami-ffqiw9qd"
+}
+
+C:\Migration -EC2-Linux>
+
+
+and then you can verify with this command about the Progress 
+
+C:\>aws ec2 describe-import-image-tasks --import-task-ids "import-ami-ffqiw9qd"
+
+Status will be ,With Progress Percentage as
+'Pending',
+'Converting'(this stage will take more time,depends on the vmdk size),
+'updating',
+'booting',
+'booted'
+'preparing ami'
+'completed'
+
+C:\>aws ec2 describe-import-image-tasks --import-task-ids "import-ami-ffqiw9qd"
+{
+    "ImportImageTasks": [
+        {
+            "Status": "completed",
+            "LicenseType": "BYOL",
+            "Description": "CentOS Mini",
+            "ImageId": "ami-3a97d155",
+            "Platform": "Linux",
+            "Architecture": "x86_64",
+            "SnapshotDetails": [
+                {
+                    "DeviceName": "/dev/sda1",
+                    "Description": "CentOS Mini",
+                    "Format": "VMDK",
+                    "DiskImageSize": 1422998016.0,
+                    "SnapshotId": "snap-008073eff4831d617",
+                    "UserBucket": {
+                        "S3Bucket": "mymigrate",
+                        "S3Key": "CentOS7-Mini.vmdk"
+                    }
+                }
+            ],
+            "ImportTaskId": "import-ami-ffqiw9qd"
+        }
+    ]
+}
+
+C:\>
+
+Once Completed,you can check the same in 
+EC2 Dashboard -> Images -> AMI 
+ - the converted one will show up here
+ - then Launch Instance and Click 'My AMI'
+ - you can find the one as below 
+
+import-ami-ffqiw9qd - ami-3a97d155
+AWS-VMImport service: Linux - CentOS Linux release 7.0.1406 (Core) - 3.10.0-123.el7.x86_64
+Root device type: ebs Virtualization type: hvm Owner: 123456789012
+
+And Just Create a EC2 Instance with Your AMI!
+and as usual,make a security group to access the Image with
+proper SSH/HTTP/ICMP 
+
+______________________________________________________________________________________________
+
+Once All done, 
+- Delete the Instance/AMI/Volumes/Snapshots from the EC2 Dashboard
+- And Delete Contents from the S3Bucket also
+- And Delete the 'vmimport' role from the IAM Console 
+______________________________________________________________________________________________
+
+To uninstall the AWS CLI, open the Control Panel and select Programs and Features. 
+Select the entry named AWS Command Line Interface and click Uninstall to launch 
+the uninstaller. Confirm that you wish to uninstall the AWS CLI when prompted.
+
+You can also launch the Programs and Features menu from the command line with 
+the following command:
+
+> appwiz.cpl
+______________________________________________________________________________________________

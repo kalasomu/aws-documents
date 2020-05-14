@@ -1,0 +1,59 @@
+AutoScaling Group 
+
+EC2 Dashboard -> AutoScaling -> Create AutoScaling Groups 
+-> Create Launch Configuration 
+-> Select AMI - Amazon Linux Machine 
+   Keep Defaults
+-> Step 3 - Configure Details 
+   Name - ScaleAuto
+   Purchasing Option - Leave It Blank
+   IAM Role - no need now
+   Monitoring - If you need CloudWatch Just Enable 
+   Step 4 - Add Storage (No need of extra Storage)
+   Step 5 - Configure Securty Group with SSH/HTTP/HTTPS 
+   Create Launch Configuration With Existing KeyPair
+Once this Window Closes 'Create AutoScaling Group' Window Opens
+   Launch Configuration -> ScaleAuto
+   Group Name - AutoScale
+   Group Size - Starts with 2 Instances
+   Network - default VPC
+   Subnet - Select Both Subnets 172.31.16.0/20 ap-south-1a
+                                172.31.0.0/20 ap-south-1b
+   
+   Advanced Details 
+   -> Load Balancing -> Receive Traffic from one or more Load Balancers
+      Classic Load Balancers -> Name of the Load Balancer
+	  Target Groups 
+	  Health Check Type - ELB 
+	  Health Check Grace Period - 300 Seconds
+	  Monitoring - 5 Minute Freq
+	  Instances Protection - Select If you want 
+   Create Auto Scaling Group
+     Keep this group at its initial size - (tick this to keep Defaults)
+     Use scaling policies to adjust the capacity of this group - Tick This
+     Scale between 1 and 2 instances. These will be the minimum and maximum 
+	 size of your group.
+   Scale Group Size
+Name:Scale Group Size
+Metric type:Average CPU utilization
+Target value: 60%
+Instances need: 30 seconds to warm up after scaling
+Disable scale-in:
+
+Configure Notifications -Configure your Auto Scaling group to send notifications 
+to a specified endpoint, such as an email address, whenever a specified event 
+takes place, including: successful launch of an instance, failed instance launch, 
+instance termination, and failed instance termination
+Add Notification (if you need you can Add Notification)
+
+Configure Tags -> Name and Value for the AutoScaling Group 
+Click Create AutoScaling Group 
+(you can see the AutoScaling Group is Successful)
+
+______________________________________________________________________________________
+
+Once the Verification is Done,
+ - Delete all AutoScaling Group 
+ - and Launch Configurations as well
+ - Once You Delete the above,Instances will get auto-deleted 
+______________________________________________________________________________________

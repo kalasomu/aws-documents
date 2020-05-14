@@ -1,0 +1,189 @@
+Route 53
+
+Steps Needed to have Route 53 to Work
+
+- An EC2 Linux Instance with httpd running
+- home page created and working fine
+- Classic Elastic Load Balancer needs to get created
+  (ELB not assigned with Public IPv4 Address automatically,Just a DNS Name gets assigned)
+- as the last step,we need Route 53 Config
+- Route 53 points back to ELB and that points back to the 
+  Linux WebServer which we created
+
+Services ->EC2 Dashboard
+
+EC2 Dashboard -> Choose AMI->Choose Instance Type
+configure Instance
+Network ->Default VPC
+Subnet  ->No Preference
+Auto-assign- Pubilc IP -> Enable
+Shutdown Behavior-> Terminate
+Tenancy -> Shared
+
+Click 'Advanced details' and paste the below script 
+to run the 'apache web server' 
+
+#!/bin/bash
+yum update -y
+yum install -y httpd
+service httpd start
+chkconfig httpd on
+echo "Hello its my site with Route53 Routed" > /var/www/html/index.html
+
+Tag Instance -> MyWebServer
+Security Groups -> SSH/HTTP/ICMPv4 
+Launch and Verify the MyWebServer with the Pubilc IP assigned
+
+Services ->EC2 Dashboard ->Load Balancers -> Create Classic LoadBalancer
+Basic Configuration 
+Load Balancer Name: MyELB
+Create LB insde: DefaultVPC
+Load Balancer Protocol: HTTP/80/HTTP/80/
+Assign Security Groups: HTTP
+Configure Health Check:
+Ping Protocol: HTTP
+Ping Port:80
+Ping Path:/index.html
+Advanced Details:
+Response Timeout:5
+Health Check Interval:10
+Unhealthy Threshold:2
+Healthy Threshold:3
+Step 5 Add EC2 Instances
+Click 'MyWebServer'
+Tick Enable Cross-Zone Load Balancing
+Tick Enable Connection Draining 300 Seconds
+Next Add Tags -> Add if u want
+Click Create
+
+Route53 Creation
+Services-> Route53 -> DNS Management -> Get Started Now
+Create Hosted Zone 
+ -on the right side panel 
+  Domain Name: YourSite.com
+  Comment: My Site with Route53
+  Type:Public Hosted Zone
+  Click Create
+ Name       Type  Value                       TTL
+mysite.com. NS 	ns-1093.awsdns-08.org.       172800
+                ns-432.awsdns-54.com. 
+                ns-589.awsdns-09.net. 
+                ns-2037.awsdns-62.co.uk.
+	
+mysite.com. SOA ns-1093.awsdns-08.org. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400
+	
+
+in the Value Field 4 NameServers are there 
+Even one Fails,other will work,so we have 4,no way of site down!!
+These 4 NS will redirect to Route53
+
+Copy one by one of the NamsServers,and Just go to your WebSite Admin Page
+for example 'godaddy.com'
+in the 'godaddy.com' under the NameServers Settings 
+(take the backup of the NameServers in the godaddy.com before modifying it)
+Click Custom and Add NameServer one by one 
+Paste one by one NameServer from the AWS Site to godaddy site.
+Click SAVE
+
+It may take 10-15 Mins,to make effect with the new NameServers.
+
+Just Come back to the AWS page.
+We may have to create A Records to maintain the WebServer.
+
+Create Record Set
+Click Alias 
+Alias Target -> Drop down and find the MyELB
+Routing Polices-> Simple 
+Evaluate Target Health: NO
+Click Create
+
+Once You Created, you can see A Record has been created
+with its Alias Value 
+
+Now you can check the same WebPage 'YourSite.com'and refresh couple of times.
+It will take its own Time to come up, may be 10mins or so.Need to Wait
+Since DNS resolving with new NameServer and with New Alias Records Created.
+Finally You may get it.With the HomePage Which we created in the MyWebServer
+as EC2 Instance inside our DefaultVPC.
+(you can even check the HomePage with DNS name of the Elastic LoadBalancer)
+
+So the Original 'godaddy.com' web page is taking the Index.Html from 
+our WebServer which is hosted in the AWS.
+__________________________________________________________________________________________________
+
+After Checking all Redirections, you can revert back to the original settings
+in the godaddy.com site with replacing old nameservers.so 'YourSite.com'
+will show the earlier constructed page.
+
+and delete as usual 
+ - instances
+ - LoadBalancers
+ - Route53 records and all
+__________________________________________________________________________________________________
+
+SOA Records
+
+- Name of the server that supplied the data for the zone
+- administrator of the zone
+- current version of the data file
+- number of seconds a secodary nameserver shld wait before checking 
+  for updates
+- number of seconds a secodary nameserver shld wait before retrying a 
+  failed zone transfer
+- mazimum number of seconds that secondary nameserver can use data before
+  it must either be refreshed or expire.
+- default number of seconds for the TTL file on resource records
+
+NS Records
+- NameServer Records are used by Top Level Domain Servers to direct traffic
+  to the content DNS Server which contains the authoritative DNS Records
+
+A Records
+- A Record is fundamental type of DNS record and the A is the A Record stands for Address
+- A Record is used by computer to translate the name of domain to IP Address
+
+TTL Records
+
+- Length of DNS record is cached on either resolving server or user own local PC
+  is equal to value of the TTL Time to Live in seconds.
+- lower the time to live,faster the changes to DNS records take to propagate
+  throughout the internet
+
+CNAMES
+
+- Canonical Names can be used to resolve one domain name to another
+- m.yoursite.com when u use mobile to access the site 
+- you may also type 'mobile.yoursite.com' to get it resolved to same address 
+
+Alias Records
+
+- used to map resource record sets in the hosted zone to Elastic LoadBalancer,
+  CloudFront Distributions,or S3 Buckets that are configured as websites
+- Alias Record works like CNAME Record in that you can map one DNS name to 
+  another 'target' DNS Name from 'www.example.com' to 'elb1234.amazonaws.com'
+- you cant have for naked domain for example 'http://example.com' site
+  (www should be prefixed domains can have Alias Records)
+- Amazon Route53 automatically recognizes changes in record sets that alias resource record  
+  set refers to.
+- for example, suppose an Alias resource record set for 'example.com' points to an ELB LoadBalancer
+  at lb1-1234.us.est-1.elb.amazonaws.com. if the IP address of the loadbalancer changes, Amazon Route53 
+  will automatically reflect those changes in DNS answers for 'example.com' without any chnages to the 
+  hosted zone that contains resource record sets for 'example.com'
+  
+__________________________________________________________________________________________________
+
+You can refer this page for records
+https://www.linode.com/docs/networking/dns/dns-records-an-introduction
+
+  A CNAME record or Canonical Name record matches up a domain (or subdomain) to a different domain. 
+  With a CNAME record, DNS lookups use the target domain’s DNS resolution as the alias’s resolution. 
+  Here’s an example:
+
+  1  alias.com       CNAME   example.com.
+  2  example.com     A       12.34.56.78
+
+  With this setup, when alias.com is requested, the initial DNS lookup will find the CNAME entry 
+  with the target of example.com. A new DNS lookup will be started for example.com, which will 
+  find the IP address 12.34.56.78. Finally, visitors to alias.com will be directed to 12.34.56.78.
+
+__________________________________________________________________________________________________

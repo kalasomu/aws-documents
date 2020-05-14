@@ -1,0 +1,99 @@
+AWS Creating EC2 (Elastic Compute Cloud)Instance
+
+- click the name -> Security Credentials
+  -> get started with IAM users -> you can create Uers here
+  
+Lets start do with the EC2 
+- Launch Instance
+  -> left hand side check Free Tier Only (else you may be charged)
+  -> choose the AMI(Amazon Machine Image)
+  -> Amazon Linux AMI 2017.03.1 -> Select 
+  -> Machine Info General Purpose -t2.micro(Free Tier Eligible)
+  -> Review and Launch
+  -> Next Screen Launch will ask KeyPair
+  -> create a new one and save KeyPair in PC
+  -> Next Screen you can see its running 
+  -> right click on server and connect 
+
+It requires Java Running Browser, better use IE Version 11
+Since the Putty Session can be directly open from browser itself
+and the KeyPair which is been downloaded, show the path to open
+the SSH session, accept all warnings/notes.you can login to the 
+AMI sucessfully.
+
+*****************************************************************
+Internet Explorer Java Settings 
+    Click Tools and then Internet Options
+    Select the Security tab, and select the Custom Level button
+    Scroll down to Scripting of Java applets
+    Make sure the Enable radio button is checked
+    Click OK to save your preference 
+*****************************************************************
+Once the SSH login to the Server checked out then stop/terminate 
+the instance its no longer required else it may cost you! 
+keep on running unnecessarily.
+___________________________________________________________________________
+
+
+EC2 Dashboard can have Images 
+- Images -> AMIs -> takes to MarketPlace, if anyone shared you can get it 
+
+Launching Windows Server 2012 R2 base 
+- Choose AMI
+- Choose Instance type (get general purpose family)
+- Configure Instance Details 
+  Number of Instances -1,2,3, anything you can say
+  leave all other details default
+  shutdown behavior-> Terminate (when stopped it will cost you)
+  Protect against accidental termination
+  Enable cloudwatch(check this,may not be in free tier)
+  Advanced Details 
+  User data -> justmake a welcome message   
+- Add Storage 
+  Root /dev/sda1 30GB all default 
+  if you want to add additional storage you can do here
+- Add Tags
+  Name : ramnetessentailserver
+- Configure Security Groups
+  Security Groups Name ramnetRDP
+  Decription:allow RDP for ramnet machines
+  RDP TCP 3389 
+  Source : Anywhere (it will be insecure if you keep from anywhere)
+  keep it as MY IP (so only from this IP it can be accessed)
+  Add Rules 
+  HTTP and HTTPS can be added so that inbound access to the Server we created
+  
+- CLick Launch
+  create a new key pair!
+- Download RDP file and KeyPair show the path 
+  while you decrypt the Password -copy it - and have it 
+  login usin the RDP file downloaded,and supply password 
+  there you go! you loggedin to the Windows server you created 
+  
+- Once testing is over, terminate the server, so that it doesnt cost 
+  you,if you getting errors even after terminate,refersh screen
+  it will show terminated
+___________________________________________________________________________
+
+For to run WebServer inside the Linux Box 
+
+Click Advanced details and paste the below script 
+to run the 'apache web server' which can be accessed
+from anywhere in internet
+
+#!/bin/bash
+yum update -y
+yum install -y httpd24 php56 mysql55-server php56-mysqlnd
+service httpd start
+chkconfig httpd on
+groupadd www
+usermod -a -G www ec2-user
+chown -R root:www /var/www
+chmod 2775 /var/www
+find /var/www -type d -exec chmod 2775 {} +
+find /var/www -type f -exec chmod 0664 {} +
+echo "<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
+
+Configure Security group -> Create a new Security Group
+SSH TCP 22 Custom - 0.0.0.0/0
+HTTP TCP 80 Custom - 0.0.0.0/0,::0

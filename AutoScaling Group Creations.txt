@@ -1,0 +1,104 @@
+AutoScaling Group Creations
+
+Create a normal WebServer on a Amazon AMI Linux Box
+by putting these lines while installing in 'Advanced Settings'
+
+#!/bin/bash
+yum install httpd -y
+yum update -y
+service httpd start
+chkconfig httpd on
+echo "<html><h1>Hello Welcome to WebServer to test AutoScaling</h1></html>" > /var/www/html/index.html
+
+then once this WebServer has been created,from this server 
+try create an image and will use this for the AutoScaling Practice.
+
+Select the Instance -> Action -> Create a Image 
+With this Image file,will create Instances for the AutoScaling Group.
+
+EC2 Dashboard -> Launch Configuration 
+   -> My AMI(which is running with WebServer) -> Select
+   -> t2.micro (free tier)
+   -> Create Launch Configuration
+      -> Name : MyLaunchConfig-01
+	  -> Click Next ->Add Storage (no need to add extra)
+	  -> Next: Configure Security Group
+	     -> Create one for HTTP and SSH 
+	  -> Review
+	  -> Create Launch Configuration
+	  -> Select an existing KeyPair
+	  -> Create Launch Configuration
+	  
+	  then the second step will open up ! AutoScaling Group 
+	  there you can find the 'MyLaunchConfig-01'
+	  
+	  Create AutoScaling Group
+	  Group Name : MyAutoScalingGrp-01
+	  Group Size : 1 Instances (is enough)
+	  Network : Default VPC
+	  Subnet : Select all Subnets Available
+	  Next: Configure Scaling Policies 
+	click -> Use Scaling Policies to adjust the capacity of this group
+	Scale between 1 and 4 Instances
+	Increase Group Size :
+	 -> Take Action ->Add -> 1 Instances
+	 -> Execute Policies When : Add New Alarm 
+	    -> Whenever CPU Utilization is >= 30 Percent
+		-> For at least Launch 1 Instances for every 1 Minute
+		-> Click Create Alarm
+	Decrease Group Size :
+	  -> Execute Policies When : Add New Alarm 
+	    -> Whenever CPU Utilization is <= 20 Percent
+		-> For at least Launch 1 Instances for every 1 Minute
+		-> Click Create Alarm
+		-> Take Action ->Remove -> 1 Instances
+	{If CPU Goes above 30% Create Instance,below 20% remove Instance}
+		
+	 Click Next Configure Notifications
+	 Click Add Notifications
+	 Send Notifications -> Create Topic -> MyAutoScaleNotification
+		Recipients		-> yourname@gmail.com
+	 Whenever Instances Launch/terminate/fail to Launch/Fail to terminate
+	   CLick Next -> Configure Tags
+	   Name : AutoScale-WebServers (Instances Name)
+	   Click -> Review
+	   CLick -> Create AutoScaling Group
+
+Just Go back to the EC2 Dashboard-> Instances Screen, 
+you can see a new Instance is coming up.
+
+- check the AMI ID as 'AutoScale-WebServers AMI' will be shown
+  Once the Instance is ready,it will come with the name we
+  mentioned on the 'Tags' as 'AutoScale-WebServers'
+- Pick the Public IP of the Instance and try access thro 'http'
+  you should get the homepage of the AutoScale-WebServers
+- try connect to the Instance thro SSH using putty
+- then create a file called 'dd.sh' which will contain the 
+  stress test lines as 'dd if=/dev/zero of=/dev/null bs=50000 count=100000'
+  (without quotes),add as many as (same) lines you want
+- change permission as 'chmod 755 dd.sh'
+- run 'nohup ./dd.sh &' to run it in background
+- run it couple of time as well, so that the load must be more 
+  on the webserver.
+- check it with 'top' command to see the CPU load Percentage
+- then you can come back to the AWS EC2 Dashboard, to check 
+  whether the Newer Instances are Created Automatically.
+  refresh the Dashboard screen couple of time to check.
+- Meanwhile you can check 'yourname@gmail.com' to check 
+  whether any Notifications has come
+- you can check EC2 Dashboard,that another server must be 
+  created with the same name as 'AutoScale-WebServers'
+  check it with its Public IP,and access it thro 'http'
+  you should get the homepage of the AutoScale-WebServers
+- since the script is keep on running on that Instance
+  you must be seeing the Instances are created Automatically
+- same way,if you stop all the scripts running,you must be 
+  seeing the Instances are removed Automatically
+  
+_________________________________________________________________
+
+Once Activity has been tested Successful
+ - delete the 'AutoScaling Group'
+ - delete the 'LauchConfigurations'
+ 
+_________________________________________________________________
